@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Saloniva",
+    "slug": "saloniva",
+    "version": "0.2.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "scheme": "saloniva",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.saloniva.app"
+    },
+    "android": {
+      "package": "com.saloniva.app",
+      "permissions": []
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": []
+  }
+}
