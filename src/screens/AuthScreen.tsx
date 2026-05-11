@@ -6,6 +6,8 @@ import { BrandMark } from "../components/BrandMark";
 import { LuxuryProductScene } from "../components/LuxuryVisual";
 import { Pill } from "../components/Pill";
 import { productConfig } from "../config/productConfig";
+import { registerSalonWithSupabase, signInWithSupabase } from "../services/supabaseAuthGateway";
+import { supabaseConfig } from "../services/supabaseConfig";
 import { colors } from "../theme/colors";
 import { radius } from "../theme/spacing";
 import type { SalonAccount, UserRole } from "../types";
@@ -28,19 +30,59 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
   const [email, setEmail] = useState("demo@saloniva.app");
   const [password, setPassword] = useState("demo1234");
   const [role, setRole] = useState<UserRole>("Salon Sahibi");
+  const [authStatus, setAuthStatus] = useState<string | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
+
+  const runAuthAction = async (action: () => Promise<SalonAccount>, successMessage: string) => {
+    setIsAuthLoading(true);
+    setAuthStatus("Supabase ile güvenli bağlantı kuruluyor...");
+
+    try {
+      const account = await action();
+      setAuthStatus(successMessage);
+      onCreateSalon(account);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "İşlem tamamlanamadı.";
+      setAuthStatus(message);
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const loginWithCloud = () => {
+    void runAuthAction(async () => {
+      const session = await signInWithSupabase(email, password);
+      return session.account;
+    }, "Giriş başarılı.");
+  };
 
   const createSalon = () => {
-    onCreateSalon({
-      salonId: `salon-${Date.now()}`,
-      salonName: salonName.trim() || "Yeni Salon",
-      ownerName: ownerName.trim() || "Salon Yetkilisi",
-      email: email.trim() || "demo@saloniva.app",
-      role,
-      planId: "starter",
-      subscriptionStatus: "Deneme",
-      trialEndsAt: "14 gün sonra",
-      permissions: [...productConfig.demoAccount.permissions]
-    });
+    if (!supabaseConfig.configured) {
+      onCreateSalon({
+        salonId: `salon-${Date.now()}`,
+        salonName: salonName.trim() || "Yeni Salon",
+        ownerName: ownerName.trim() || "Salon Yetkilisi",
+        email: email.trim() || "demo@saloniva.app",
+        role,
+        planId: "starter",
+        subscriptionStatus: "Deneme",
+        trialEndsAt: "14 gün sonra",
+        permissions: [...productConfig.demoAccount.permissions]
+      });
+      return;
+    }
+
+    void runAuthAction(async () => {
+      const session = await registerSalonWithSupabase({
+        salonName,
+        ownerName,
+        email,
+        password,
+        role,
+        planId: "starter"
+      });
+      return session.account;
+    }, "Salon hesabı oluşturuldu.");
   };
 
   return (
@@ -77,7 +119,10 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
           role={role}
           setRole={setRole}
           onDemoLogin={onDemoLogin}
+          loginWithCloud={loginWithCloud}
           createSalon={createSalon}
+          authStatus={authStatus}
+          isAuthLoading={isAuthLoading}
         />
       )}
     </ScrollView>
@@ -133,6 +178,9 @@ function AuthCard({
   role,
   setRole,
   onDemoLogin,
+  loginWithCloud,
+  authStatus,
+  isAuthLoading,
   createSalon
 }: {
   mode: AuthMode;
@@ -148,6 +196,9 @@ function AuthCard({
   role: UserRole;
   setRole: (role: UserRole) => void;
   onDemoLogin: () => void;
+  loginWithCloud: () => void;
+  authStatus: string | null;
+  isAuthLoading: boolean;
   createSalon: () => void;
 }) {
   return (
@@ -166,7 +217,12 @@ function AuthCard({
             <Text style={styles.formTitle}>Salon hesabınıza giriş yapın</Text>
             <TextInput value={email} onChangeText={setEmail} placeholder="E-posta" keyboardType="email-address" autoCapitalize="none" style={styles.input} />
             <TextInput value={password} onChangeText={setPassword} placeholder="Şifre" secureTextEntry style={styles.input} />
-            <ActionButton icon="log-in-outline" label="Giriş Yap" primary onPress={onDemoLogin} />
+            <ActionButton
+              icon="log-in-outline"
+              label={isAuthLoading ? "Bağlanıyor" : "Giriş Yap"}
+              primary
+              onPress={loginWithCloud}
+            />
             <Pressable onPress={onDemoLogin} style={styles.demoButton}>
               <Text style={styles.demoText}>Demo hesapla incele</Text>
             </Pressable>
@@ -183,9 +239,16 @@ function AuthCard({
                 <Pill key={item} label={item} active={role === item} onPress={() => setRole(item)} />
               ))}
             </View>
-            <ActionButton icon="business-outline" label="Salonu Oluştur" primary onPress={createSalon} />
+            <ActionButton
+              icon="business-outline"
+              label={isAuthLoading ? "Oluşturuluyor" : "Salonu Oluştur"}
+              primary
+              onPress={createSalon}
+            />
           </View>
         )}
+
+        {authStatus ? <Text style={styles.statusText}>{authStatus}</Text> : null}
 
         <Text style={styles.legalText}>
           Devam ederek kullanım koşullarını, gizlilik politikasını ve hesap silme süreçlerini kabul etmiş olursunuz.
@@ -424,6 +487,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8
+  },
+  statusText: {
+    borderRadius: radius.sm,
+    backgroundColor: colors.accentSoft,
+    color: colors.accent,
+    fontWeight: "800",
+    lineHeight: 20,
+    padding: 12
   },
   legalText: {
     color: colors.muted,

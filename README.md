@@ -9,7 +9,8 @@ Uygulama; randevu, musteri, paket, seans, odeme, rapor, vitrin ve satis firsatla
 - Demo ve pilot gorusme icin hazir.
 - Web onizleme calisiyor.
 - Android/iOS hedefi Expo uzerinden planlandi.
-- Gercek musteri kullanimi icin backend ve odeme henuz baglanmadi.
+- Supabase veritabani ve gercek salon hesabi olusturma akisi baslatildi.
+- Gercek musteri kullanimi icin cloud veri yazma, odeme ve canli testler tamamlanmali.
 
 ## Demo Hesap
 

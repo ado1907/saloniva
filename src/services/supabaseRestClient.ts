@@ -86,5 +86,17 @@ export const supabaseRestClient = {
     });
 
     return parseResponse<T[]>(response);
+  },
+
+  async rpc<T>(functionName: string, payload: JsonRecord, options?: SupabaseQueryOptions) {
+    assertConfigured();
+
+    const response = await fetch(`${supabaseConfig.url}/rest/v1/rpc/${functionName}`, {
+      method: "POST",
+      headers: buildHeaders(options?.accessToken),
+      body: JSON.stringify(payload)
+    });
+
+    return parseResponse<T>(response);
   }
 };
