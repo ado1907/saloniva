@@ -59,7 +59,7 @@ export function createDemoAuthSession(): AuthSession {
       planId: productConfig.demoAccount.planId,
       subscriptionStatus: productConfig.demoAccount.subscriptionStatus,
       trialEndsAt: productConfig.demoAccount.trialEndsAt,
-      permissions: productConfig.demoAccount.permissions
+      permissions: [...productConfig.demoAccount.permissions]
     }
   };
 }
@@ -77,8 +77,7 @@ export function createRegisteredSalonSession(payload: RegisterSalonPayload): Aut
       planId: payload.planId,
       subscriptionStatus: "Deneme",
       trialEndsAt: "14 gün sonra",
-      permissions: productConfig.demoAccount.permissions
+      permissions: [...productConfig.demoAccount.permissions]
     }
   };
 }
-

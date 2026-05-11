@@ -75,7 +75,7 @@ function SalonivaApp() {
       planId: productConfig.demoAccount.planId,
       subscriptionStatus: productConfig.demoAccount.subscriptionStatus,
       trialEndsAt: productConfig.demoAccount.trialEndsAt,
-      permissions: productConfig.demoAccount.permissions
+      permissions: [...productConfig.demoAccount.permissions]
     });
   };
 

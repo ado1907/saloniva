@@ -58,9 +58,14 @@ Gercek backend tarafinda her istek icin kullanicinin `salonId`, rol ve izinleri 
 - `src/services/authGateway.ts`: demo session, gercek auth ve salon kayit sozlesmesi.
 - `src/services/cloudDatabasePlan.ts`: bulut tablo plani ve tenant izolasyon kurallari.
 - `src/services/subscriptionGateway.ts`: abonelik, checkout ve lisans kontrol plani.
+- `src/services/supabaseConfig.ts`: Supabase ortam ayarlari ve backend modu.
+- `src/services/supabaseRestClient.ts`: Supabase REST istemcisi.
+- `src/services/cloudSalonGateway.ts`: bulut veri okuma gateway taslagi.
 - `src/config/storeLaunchAssets.ts`: ikon, splash, ekran goruntusu ve hukuki link listesi.
 - `src/qa/productionTestScenarios.ts`: gercek test senaryolari ve kabul kriterleri.
 - `src/screens/ProductionReadinessScreen.tsx`: tum uretim adimlarini uygulama icinde takip eden ekran.
+- `supabase/schema.sql`: Supabase tablo ve RLS politikalari.
+- `docs/supabase-backend-setup.md`: Supabase kurulum rehberi.
 
 ## API Sozlesmeleri
 

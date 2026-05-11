@@ -141,6 +141,7 @@ Canli satis icin tamamlanacak ana basliklar:
 - [Pilot Satis Paketi](./docs/pilot-sales-kit.md)
 - [Canli Urun Plani](./docs/production-launch-plan.md)
 - [Backend Mimari Notlari](./docs/backend-architecture.md)
+- [Supabase Backend Kurulumu](./docs/supabase-backend-setup.md)
 - [Magaza Hazirligi](./docs/store-readiness.md)
 - [Ajan Calisma Sirasi](./docs/agent-workflow.md)
 - [Guvenlik Taramasi](./docs/security-review.md)

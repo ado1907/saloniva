@@ -39,7 +39,7 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
       planId: "starter",
       subscriptionStatus: "Deneme",
       trialEndsAt: "14 gün sonra",
-      permissions: productConfig.demoAccount.permissions
+      permissions: [...productConfig.demoAccount.permissions]
     });
   };
 

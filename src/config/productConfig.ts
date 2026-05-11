@@ -42,4 +42,4 @@ export const productConfig = {
     trialEndsAt: "23 Mayıs 2026",
     permissions: ["randevu", "musteri", "odeme", "rapor", "ayar", "personel"]
   }
-};
+} as const;
