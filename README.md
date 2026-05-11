@@ -143,6 +143,7 @@ Canli satis icin tamamlanacak ana basliklar:
 - [Backend Mimari Notlari](./docs/backend-architecture.md)
 - [Magaza Hazirligi](./docs/store-readiness.md)
 - [Ajan Calisma Sirasi](./docs/agent-workflow.md)
+- [Guvenlik Taramasi](./docs/security-review.md)
 
 ## Not
 

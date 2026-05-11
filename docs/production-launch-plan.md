@@ -83,3 +83,7 @@ Canli Urun Hazirligi ekrani, gercek kullanici girisi, bulut veritabani, salon te
 ## 13. Pilot Satis Paketi
 
 Pilot Satis Paketi, Saloniva'yi gercek salonlara gostermek icin hazir demo akisi, pilot teklif, gorusme sorulari ve takip listesini icerir. Bu paket canli urun tamamlanmadan once pilot musteri bulmak ve urun geri bildirimi toplamak icin kullanilir.
+
+## 14. Guvenlik Taramasi
+
+Guvenlik taramasi `docs/security-review.md` icinde tutulur. Mevcut sonuc: demo ve pilot gorusme icin uygun; gercek musteri verisiyle canli kullanim icin auth, tenant izolasyonu, backend veri saklama, odeme/lisans, hesap silme ve audit log tamamlanmalidir.
