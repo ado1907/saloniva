@@ -30,11 +30,16 @@ const styles = StyleSheet.create({
     minHeight: 66,
     borderRadius: radius.sm,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
+    borderColor: colors.softBorder,
+    backgroundColor: colors.card,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
-    paddingHorizontal: 6
+    paddingHorizontal: 6,
+    shadowColor: colors.shadow,
+    shadowOpacity: 1,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4
   }
 });

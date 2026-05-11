@@ -28,14 +28,19 @@ const styles = StyleSheet.create({
   button: {
     minHeight: 40,
     borderRadius: radius.sm,
-    paddingHorizontal: 13,
+    paddingHorizontal: 14,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
+    borderColor: colors.softBorder,
+    backgroundColor: colors.card,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8
+    gap: 8,
+    shadowColor: colors.shadow,
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 1
   },
   primary: {
     borderColor: colors.sage,

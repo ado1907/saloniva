@@ -6,33 +6,46 @@ Bu rapor Saloniva uygulamasinin mevcut demo/pilot satis surumu icin yapilan guve
 
 ## Genel Sonuc
 
-Saloniva su an demo ve pilot gorusme icin kullanilabilir. Ancak gercek musteri verisiyle canli kullanima acilmadan once backend, tenant izolasyonu, gercek auth, odeme/lisans kontrolu, veri silme/disari aktarma ve test surecleri tamamlanmalidir.
+Saloniva su an demo ve pilot gorusme icin kullanilabilir. Supabase veritabani, RLS politikalari ve gercek salon hesabi olusturma akisi baslatildi. Ancak gercek musteri verisiyle canli kullanima acilmadan once cloud veri yazma/okuma, odeme/lisans kontrolu, veri silme/disari aktarma ve gercek cihaz testleri tamamlanmalidir.
+
+## 2026-05-11 Ek Tarama
+
+Yapilan kontroller:
+
+- `npm run typecheck`: basarili.
+- `npm audit --json`: 8 uyarı, 6 high ve 2 moderate, critical yok.
+- `.env` dosyasi `.gitignore` icinde korunuyor.
+- Yerel `.env` icinde `sb_publishable_` anahtar tipi kullaniliyor.
+- Kaynak kodda `sb_secret_` canli gizli anahtar bulunmadi.
+- `service_role` kelimesi sadece uyarici metinlerde geciyor; uygulama anahtari olarak kullanilmiyor.
+- Supabase semasinda RLS aktif.
+- Auth RPC fonksiyonlari sadece authenticated role icin grant edildi.
 
 ## Kritik Riskler
 
-### 1. Gercek Auth ve Tenant Izolasyonu Henuz Yok
+### 1. Gercek Auth ve Tenant Izolasyonu Tamamlanma Asamasinda
 
-Durum: Planlandi, henuz gercek backend'e baglanmadi.
+Durum: Supabase semasi, RLS politikalari ve auth RPC temeli eklendi; uygulama giris ekrani Supabase Auth'a baglanmaya basladi.
 
 Ilgili dosyalar:
 
-- `src/services/authGateway.ts`
-- `src/services/backendGateway.ts`
-- `src/services/cloudDatabasePlan.ts`
-- `src/security/rolePermissions.ts`
+- `src/services/supabaseAuthGateway.ts`
+- `src/services/supabaseRestClient.ts`
+- `supabase/schema.sql`
+- `supabase/phase2-auth.sql`
 
 Risk:
 
 - Canli urunde her salon kendi verisini gormeli.
-- Rol ve salonId kontrolu sadece uygulama ekraninda kalmamali.
-- Backend tarafinda zorunlu kontrol olmadan gercek musteri verisi kullanilamaz.
+- RLS temeli var, fakat tum formlar henuz cloud insert/update akisini kullanmiyor.
+- Auth RPC fonksiyonlari canliya alinmadan once Supabase uzerinde gercek kullaniciyle test edilmeli.
 
 Oneri:
 
-- Supabase, Firebase veya ozel API sec.
-- Her API isteginde `salonId` oturumdan dogrulansin.
-- Client tarafindan gelen rol bilgisine guvenilmesin.
-- RLS / server-side permission check zorunlu olsun.
+- `supabase/phase2-auth.sql` Supabase SQL Editor'da calistirilsin.
+- Authentication email confirmation ayari test ve canli icin bilincli secilsin.
+- Musteri, randevu, odeme ve paket formlari tek tek cloud yazma akisine tasinsin.
+- Public booking icin rate limit / spam korumasi eklensin.
 
 ### 2. Hassas Veri AsyncStorage'da Saklaniyor
 

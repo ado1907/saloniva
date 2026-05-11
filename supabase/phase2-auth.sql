@@ -45,9 +45,9 @@ begin
 
   insert into public.salons (name, slug, owner_name, plan_id, subscription_status, trial_ends_at)
   values (
-    nullif(trim(salon_name_input), ''),
+    coalesce(nullif(trim(salon_name_input), ''), 'Yeni Salon'),
     final_slug,
-    nullif(trim(owner_name_input), ''),
+    coalesce(nullif(trim(owner_name_input), ''), 'Salon Yetkilisi'),
     plan_id_input,
     'Deneme',
     now() + interval '14 days'

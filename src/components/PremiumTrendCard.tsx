@@ -41,10 +41,15 @@ const styles = StyleSheet.create({
     minWidth: 210,
     borderRadius: radius.sm,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
+    borderColor: colors.softBorder,
+    backgroundColor: colors.card,
     padding: 15,
-    gap: 14
+    gap: 14,
+    shadowColor: colors.shadow,
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 7 },
+    elevation: 2
   },
   title: {
     color: colors.muted,

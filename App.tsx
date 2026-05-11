@@ -220,28 +220,40 @@ const styles = StyleSheet.create({
   },
   shell: {
     flex: 1,
-    flexDirection: "row"
+    flexDirection: "row",
+    backgroundColor: colors.background
   },
   shellDark: {
     backgroundColor: colors.ink
   },
   content: {
-    flex: 1
+    flex: 1,
+    backgroundColor: colors.background
   },
   contentDark: {
     backgroundColor: "#2b2a20"
   },
   scrollContent: {
-    padding: 18,
+    padding: 20,
     paddingBottom: 108
   },
   header: {
     gap: 16,
-    marginBottom: 20,
+    marginBottom: 22,
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
-    flexWrap: "wrap"
+    flexWrap: "wrap",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.softBorder,
+    backgroundColor: colors.card,
+    padding: 16,
+    shadowColor: colors.shadow,
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 7 },
+    elevation: 2
   },
   headerDark: {
     borderRadius: 7,

@@ -14,10 +14,10 @@ export function CinematicSalonHero() {
     <ImageBackground source={{ uri: visualAssets.treatmentRoom }} style={styles.hero} imageStyle={styles.image}>
       <View style={styles.overlay}>
         <View style={styles.copy}>
-          <Text style={styles.kicker}>Saloniva premium cockpit</Text>
-          <Text style={styles.title}>Lüks salon deneyimi, güçlü işletme kontrolü</Text>
+          <Text style={styles.kicker}>Saloniva operasyon merkezi</Text>
+          <Text style={styles.title}>Günlük kararlar, gelir ve müşteri akışı tek ekranda</Text>
           <Text style={styles.text}>
-            Randevu, gelir, müşteri sadakati ve satış fırsatları tek sahnede birleşir. Demo sunumunda ilk bakışta premium ürün hissi verir.
+            Salon sahibi sabah açtığında doluluk, tahsilat, ekip yoğunluğu ve fırsatları net bir sırada görür.
           </Text>
         </View>
         <View style={styles.stats}>
@@ -55,20 +55,25 @@ function ImageTile({ image, label }: { image: string; label: string }) {
 
 const styles = StyleSheet.create({
   hero: {
-    minHeight: 310,
+    minHeight: 322,
     borderRadius: radius.sm,
     borderWidth: 1,
-    borderColor: colors.sage,
+    borderColor: "rgba(244, 231, 206, 0.30)",
     overflow: "hidden",
-    backgroundColor: colors.ink
+    backgroundColor: colors.ink,
+    shadowColor: colors.shadow,
+    shadowOpacity: 1,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 3
   },
   image: {
     resizeMode: "cover"
   },
   overlay: {
-    minHeight: 310,
-    padding: 18,
-    backgroundColor: "rgba(25, 24, 18, 0.46)",
+    minHeight: 322,
+    padding: 20,
+    backgroundColor: "rgba(18, 20, 16, 0.50)",
     justifyContent: "space-between",
     gap: 18
   },
@@ -84,9 +89,9 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.white,
-    fontSize: 31,
+    fontSize: 34,
     fontWeight: "800",
-    lineHeight: 38
+    lineHeight: 42
   },
   text: {
     color: "#f2eadb",

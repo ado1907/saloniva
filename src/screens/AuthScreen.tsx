@@ -21,6 +21,11 @@ type AuthMode = "login" | "create";
 type AuthView = "auth" | "marketing";
 
 const roles: UserRole[] = ["Salon Sahibi", "Yönetici", "Personel"];
+const proofPoints = [
+  ["Bulut", "Supabase hazır"],
+  ["Güvenlik", "RLS temeli"],
+  ["Platform", "Web / iOS / Android"]
+];
 
 export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
   const [mode, setMode] = useState<AuthMode>("login");
@@ -134,8 +139,13 @@ function MarketingView({ onDemoLogin, onStart }: { onDemoLogin: () => void; onSt
     <>
       <View style={styles.hero}>
         <View style={styles.heroCopy}>
-          <BrandMark size="lg" />
-          <AnimatedText style={styles.brand}>Saloniva</AnimatedText>
+          <View style={styles.heroBrandRow}>
+            <BrandMark size="lg" />
+            <View>
+              <AnimatedText style={styles.brand}>Saloniva</AnimatedText>
+              <Text style={styles.brandNote}>Premium salon işletim sistemi</Text>
+            </View>
+          </View>
           <AnimatedText delay={110} style={styles.headline}>Salonunuzu web, Android ve iOS üzerinden tek hesapla yönetin.</AnimatedText>
           <Text style={styles.subline}>
             Randevu, müşteri, paket, seans ve ödeme takibini sade bir profesyonel panelde toplayın.
@@ -143,6 +153,14 @@ function MarketingView({ onDemoLogin, onStart }: { onDemoLogin: () => void; onSt
           <View style={styles.heroActions}>
             <ActionButton icon="play-circle-outline" label="Demo İncele" primary onPress={onDemoLogin} />
             <ActionButton icon="business-outline" label="Salon Hesabı Aç" onPress={onStart} />
+          </View>
+          <View style={styles.proofGrid}>
+            {proofPoints.map(([label, value]) => (
+              <View key={label} style={styles.proofItem}>
+                <Text style={styles.proofLabel}>{label}</Text>
+                <Text style={styles.proofValue}>{value}</Text>
+              </View>
+            ))}
           </View>
           <View style={styles.featureGrid}>
             <Feature title="Randevu Takvimi" text="Günlük akışı ve personel yoğunluğunu takip edin." />
@@ -286,10 +304,10 @@ const styles = StyleSheet.create({
   },
   topNav: {
     borderRadius: radius.sm,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: colors.border,
-    padding: 10,
+    borderColor: colors.softBorder,
+    padding: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -328,14 +346,19 @@ const styles = StyleSheet.create({
   },
   hero: {
     borderRadius: radius.sm,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: colors.border,
-    padding: 20,
-    gap: 18,
+    borderColor: colors.softBorder,
+    padding: 22,
+    gap: 20,
     flexDirection: "row",
     flexWrap: "wrap",
-    alignItems: "stretch"
+    alignItems: "stretch",
+    shadowColor: colors.shadow,
+    shadowOpacity: 1,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 2
   },
   heroCopy: {
     flex: 1.15,
@@ -346,17 +369,27 @@ const styles = StyleSheet.create({
     flex: 0.85,
     minWidth: 260
   },
+  heroBrandRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 13
+  },
   brand: {
     color: colors.accent,
     fontSize: 16,
     fontWeight: "800",
     textTransform: "uppercase"
   },
+  brandNote: {
+    color: colors.muted,
+    fontWeight: "700",
+    marginTop: 4
+  },
   headline: {
     color: colors.text,
-    fontSize: 30,
+    fontSize: 34,
     fontWeight: "800",
-    lineHeight: 37
+    lineHeight: 42
   },
   subline: {
     color: colors.muted,
@@ -368,6 +401,31 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 10
   },
+  proofGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8
+  },
+  proofItem: {
+    flex: 1,
+    minWidth: 130,
+    borderRadius: radius.sm,
+    borderWidth: 1,
+    borderColor: colors.softBorder,
+    backgroundColor: colors.accentSofter,
+    padding: 11
+  },
+  proofLabel: {
+    color: colors.muted,
+    fontSize: 12,
+    fontWeight: "800",
+    textTransform: "uppercase"
+  },
+  proofValue: {
+    color: colors.text,
+    fontWeight: "800",
+    marginTop: 4
+  },
   featureGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -378,8 +436,10 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 170,
     borderRadius: radius.sm,
-    backgroundColor: colors.mutedSurface,
-    padding: 12
+    borderWidth: 1,
+    borderColor: colors.softBorder,
+    backgroundColor: colors.surface,
+    padding: 13
   },
   featureTitle: {
     color: colors.text,
@@ -425,11 +485,16 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: radius.sm,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: colors.border,
-    padding: 16,
-    gap: 16
+    borderColor: colors.softBorder,
+    padding: 18,
+    gap: 16,
+    shadowColor: colors.shadow,
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 2
   },
   modeSwitch: {
     minHeight: 44,

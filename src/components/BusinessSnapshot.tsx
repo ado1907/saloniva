@@ -68,27 +68,32 @@ const styles = StyleSheet.create({
   wrap: {
     borderRadius: radius.sm,
     borderWidth: 1,
-    borderColor: colors.sage,
-    backgroundColor: colors.ink,
+    borderColor: colors.softBorder,
+    backgroundColor: colors.card,
     padding: 16,
-    gap: 14
+    gap: 14,
+    shadowColor: colors.shadow,
+    shadowOpacity: 1,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 2
   },
   header: {
     gap: 5
   },
   kicker: {
-    color: colors.goldSoft,
+    color: colors.champagne,
     fontWeight: "800",
     textTransform: "uppercase",
     fontSize: 12
   },
   title: {
-    color: colors.white,
-    fontSize: 22,
+    color: colors.text,
+    fontSize: 23,
     fontWeight: "800"
   },
   copy: {
-    color: "#f3ead8",
+    color: colors.muted,
     lineHeight: 20
   },
   grid: {
@@ -101,8 +106,8 @@ const styles = StyleSheet.create({
     minWidth: 145,
     borderRadius: radius.sm,
     borderWidth: 1,
-    borderColor: "rgba(245, 231, 204, 0.20)",
-    backgroundColor: "#302b22",
+    borderColor: colors.softBorder,
+    backgroundColor: colors.surface,
     padding: 12
   },
   dot: {
@@ -121,29 +126,29 @@ const styles = StyleSheet.create({
     backgroundColor: colors.sage
   },
   signalLabel: {
-    color: "#f3ead8",
+    color: colors.mutedDark,
     fontWeight: "700"
   },
   signalValue: {
-    color: colors.white,
+    color: colors.text,
     fontSize: 22,
     fontWeight: "800",
     marginTop: 5
   },
   signalDetail: {
-    color: "#dfd0b8",
+    color: colors.muted,
     marginTop: 4,
     lineHeight: 18
   },
   actionStrip: {
     borderRadius: radius.sm,
-    backgroundColor: "#344034",
+    backgroundColor: colors.accentSofter,
     borderWidth: 1,
-    borderColor: colors.sage,
+    borderColor: colors.sageSoft,
     padding: 12
   },
   actionText: {
-    color: colors.goldSoft,
+    color: colors.accent,
     fontWeight: "700",
     lineHeight: 20
   }

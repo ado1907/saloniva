@@ -27,9 +27,14 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: radius.sm,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-    padding: 15
+    borderColor: colors.softBorder,
+    backgroundColor: colors.card,
+    padding: 15,
+    shadowColor: colors.shadow,
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 7 },
+    elevation: 2
   },
   header: {
     flexDirection: "row",

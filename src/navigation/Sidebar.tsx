@@ -15,6 +15,9 @@ export function Sidebar({ activeTab, setActiveTab }: Props) {
       <BrandMark dark />
       <Text style={styles.brandName}>Saloniva</Text>
       <Text style={styles.brandSubtitle}>Salon yönetimi</Text>
+      <View style={styles.statusPill}>
+        <Text style={styles.statusText}>Cloud ready</Text>
+      </View>
       <View style={styles.nav}>
         <NavItem icon="grid-outline" label="Panel" tab="panel" activeTab={activeTab} setActiveTab={setActiveTab} />
         <NavItem icon="calendar-outline" label="Takvim" tab="calendar" activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -36,9 +39,9 @@ const styles = StyleSheet.create({
     width: 248,
     paddingHorizontal: 22,
     paddingVertical: 26,
-    backgroundColor: colors.ink,
+    backgroundColor: colors.inkSoft,
     borderRightWidth: 1,
-    borderRightColor: colors.gold
+    borderRightColor: "rgba(244, 231, 206, 0.16)"
   },
   brandName: {
     marginTop: 12,
@@ -50,8 +53,24 @@ const styles = StyleSheet.create({
     color: "#d9d2c5",
     marginTop: 3
   },
+  statusPill: {
+    alignSelf: "flex-start",
+    marginTop: 14,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "rgba(244, 231, 206, 0.28)",
+    backgroundColor: "rgba(244, 231, 206, 0.10)",
+    paddingHorizontal: 10,
+    paddingVertical: 6
+  },
+  statusText: {
+    color: colors.goldSoft,
+    fontSize: 12,
+    fontWeight: "800",
+    textTransform: "uppercase"
+  },
   nav: {
     gap: 8,
-    marginTop: 34
+    marginTop: 28
   }
 });
