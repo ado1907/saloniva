@@ -238,6 +238,45 @@ function paymentPayload(payment: Payment, salonId: string) {
   };
 }
 
+function servicePayload(service: SalonService, salonId: string) {
+  return {
+    salon_id: salonId,
+    name: service.name,
+    category: service.category,
+    duration_minutes: service.durationMinutes,
+    price: service.price,
+    active: service.active,
+    staff: service.staff
+  };
+}
+
+function staffPayload(staffMember: StaffMember, salonId: string) {
+  return {
+    salon_id: salonId,
+    name: staffMember.name,
+    role: staffMember.role,
+    phone: staffMember.phone,
+    active: staffMember.active,
+    services: staffMember.services,
+    appointments_today: staffMember.appointmentsToday,
+    monthly_revenue: staffMember.monthlyRevenue,
+    next_appointment: staffMember.nextAppointment
+  };
+}
+
+function inventoryPayload(item: InventoryItem, salonId: string) {
+  return {
+    salon_id: salonId,
+    name: item.name,
+    category: item.category,
+    quantity: item.quantity,
+    unit: item.unit,
+    min_quantity: item.minQuantity,
+    cost: item.cost,
+    supplier: item.supplier
+  };
+}
+
 export function createCloudSalonGateway(options: CloudGatewayOptions): BackendGateway {
   return {
     mode: "cloud-ready",
@@ -327,6 +366,30 @@ export function createCloudSalonGateway(options: CloudGatewayOptions): BackendGa
         { accessToken: options.accessToken }
       );
       return mapPayment(rows[0] ?? {});
+    },
+    async createSalonService(service) {
+      const rows = await supabaseRestClient.insert<CloudRow>(
+        "salon_services",
+        servicePayload(service, options.salonId),
+        { accessToken: options.accessToken }
+      );
+      return mapService(rows[0] ?? {});
+    },
+    async createStaffMember(staffMember) {
+      const rows = await supabaseRestClient.insert<CloudRow>(
+        "staff_members",
+        staffPayload(staffMember, options.salonId),
+        { accessToken: options.accessToken }
+      );
+      return mapStaff(rows[0] ?? {});
+    },
+    async createInventoryItem(item) {
+      const rows = await supabaseRestClient.insert<CloudRow>(
+        "inventory_items",
+        inventoryPayload(item, options.salonId),
+        { accessToken: options.accessToken }
+      );
+      return mapInventory(rows[0] ?? {});
     }
   };
 }

@@ -76,7 +76,7 @@ export const customers: Customer[] = [
     phone: "0532 000 00 00",
     lastVisit: "Bugün",
     totalSpent: 8400,
-    debt: 1200,
+    debt: 3000,
     packageLabel: "Lazer Paketi: 5 seans kaldı",
     note: "Hassas cilt, düşük yoğunluk tercih ediyor."
   },
@@ -99,6 +99,26 @@ export const customers: Customer[] = [
     debt: 2800,
     packageLabel: "Cilt Bakımı: 2 seans kaldı",
     note: "Nude tonları seviyor."
+  },
+  {
+    id: "c4",
+    name: "Derya Şahin",
+    phone: "0535 000 00 00",
+    lastVisit: "1 hafta önce",
+    totalSpent: 18900,
+    debt: 0,
+    packageLabel: "Bölgesel İncelme: 4 seans kaldı",
+    note: "Akşam saatlerini tercih ediyor, VIP oda talebi var."
+  },
+  {
+    id: "c5",
+    name: "İrem Demir",
+    phone: "0536 000 00 00",
+    lastVisit: "Bugün",
+    totalSpent: 3600,
+    debt: 1100,
+    packageLabel: "Saç Bakımı: tek seans",
+    note: "Keratin bakım sonrası ürün önerisi bekliyor."
   }
 ];
 

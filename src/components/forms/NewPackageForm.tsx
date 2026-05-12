@@ -27,31 +27,31 @@ export function NewPackageForm({ onDone }: Props) {
 
   const submit = () => {
     const sessions = Number(totalSessions);
-    const price = Number(totalPrice);
-    const paidAmount = Number(paid) || 0;
+    const price = parseMoney(totalPrice);
+    const paidAmount = parseMoney(paid);
 
     if (!customer.trim()) {
-      setError("Paket tanımlamak için müşteri seçilmeli veya yazılmalı.");
+      setError("Paket tanımlamak için müşteri seçin veya müşteri adını yazın.");
       return;
     }
 
     if (!title.trim()) {
-      setError("Paket adı gerekli.");
+      setError("Paketin satışta görünecek adını girin.");
       return;
     }
 
     if (!sessions || sessions <= 0) {
-      setError("Toplam seans 0'dan büyük olmalı.");
+      setError("Toplam seans sayısı 0'dan büyük olmalı.");
       return;
     }
 
     if (!price || price <= 0) {
-      setError("Paket ücreti 0'dan büyük olmalı.");
+      setError("Paket ücreti 0 TL'den büyük olmalı.");
       return;
     }
 
     if (paidAmount < 0 || paidAmount > price) {
-      setError("Ödenen tutar 0 ile paket ücreti arasında olmalı.");
+      setError("İlk ödeme paket ücretinden yüksek olamaz.");
       return;
     }
 
@@ -120,4 +120,10 @@ export function NewPackageForm({ onDone }: Props) {
       </View>
     </View>
   );
+}
+
+function parseMoney(value: string) {
+  const normalized = value.replace(/\./g, "").replace(",", ".").trim();
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : 0;
 }

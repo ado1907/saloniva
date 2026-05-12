@@ -16,13 +16,20 @@ export function NewCustomerForm({ onDone }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const submit = () => {
+    const cleanPhone = phone.trim().replace(/\D/g, "");
+
     if (!name.trim()) {
-      setError("Müşteri kaydetmek için ad soyad gerekli.");
+      setError("Müşteri kartı oluşturmak için ad soyad bilgisini girin.");
       return;
     }
 
     if (!phone.trim()) {
-      setError("Müşteri kaydetmek için telefon numarası gerekli.");
+      setError("Randevu hatırlatmaları için müşterinin telefon numarasını girin.");
+      return;
+    }
+
+    if (cleanPhone.length < 10) {
+      setError("Telefon numarası eksik görünüyor. Örnek format: 0532 000 00 00.");
       return;
     }
 

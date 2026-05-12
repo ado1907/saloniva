@@ -21,6 +21,19 @@ Yapilan kontroller:
 - Supabase semasinda RLS aktif.
 - Auth RPC fonksiyonlari sadece authenticated role icin grant edildi.
 
+## 2026-05-12 Ek Tarama
+
+Yapilan kontroller:
+
+- `npm.cmd run typecheck`: basarili.
+- `schema.sql` ve `phase2-auth.sql` Supabase SQL Editor uzerinde calisti.
+- Gercek Supabase kullanicisiyle hesap olusturma, cikis ve tekrar giris akisi test edildi.
+- Musteri, randevu ve odeme cloud yazma akisi test edildi.
+- Iki farkli test salonu ile tenant izolasyonu kontrol edildi; salonlar birbirinin verisini okuyamadi veya diger salona yazamadi.
+- `.env` haric GitHub'a gidecek dosyalarda `sb_secret_` veya canli Supabase publishable key bulunmadi.
+- `service_role` sadece uyari/dokuman metinlerinde geciyor, istemci kodunda anahtar olarak kullanilmiyor.
+- Demo veri yukleme akisi cloud modda bos salonu dolduracak sekilde genisletildi; mevcut verisi olan salonda otomatik ustune yazmaz.
+
 ## Kritik Riskler
 
 ### 1. Gercek Auth ve Tenant Izolasyonu Tamamlanma Asamasinda

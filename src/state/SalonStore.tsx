@@ -8,7 +8,7 @@ import {
   salonServices as initialSalonServices,
   staffMembers as initialStaffMembers
 } from "../data/demoData";
-import { createDemoBackendGateway } from "../services/backendGateway";
+import { createDemoBackendGateway, type BackendGateway, type SalonDataSnapshot } from "../services/backendGateway";
 import { createCloudSalonGateway } from "../services/cloudSalonGateway";
 import type { AuthSession } from "../services/authGateway";
 import type { Appointment, AppointmentStatus, BookingRequest, Customer, InventoryItem, Payment, SalonService, ServicePackage, StaffMember } from "../types";
@@ -312,6 +312,31 @@ export function SalonStoreProvider({ children, session }: { children: ReactNode;
         setNotice("Paket seansı kullanıldı.");
       },
       resetDemoData: () => {
+        if (backendGateway.mode === "cloud-ready") {
+          if (customers.length > 0 || appointments.length > 0 || packages.length > 0 || payments.length > 0) {
+            setNotice("Bu bulut salonunda veri var. Mevcut demo hesabını korumak için otomatik yükleme yapılmadı.");
+            return;
+          }
+
+          setNotice("Profesyonel demo verileri Supabase'e yükleniyor...");
+          void seedCloudDemoData(backendGateway)
+            .then((snapshot) => {
+              setAppointments(snapshot.appointments);
+              setCustomers(snapshot.customers);
+              setPackages(snapshot.packages);
+              setPayments(snapshot.payments);
+              setSalonServices(snapshot.salonServices);
+              setStaffMembers(snapshot.staffMembers);
+              setBookingRequests(snapshot.bookingRequests);
+              setInventoryItems(snapshot.inventoryItems);
+              setNotice("Demo hesabı müşteri, randevu, ödeme ve stok verileriyle hazırlandı.");
+            })
+            .catch((error) => {
+              setNotice(`Demo veriler buluta yüklenemedi: ${getErrorMessage(error)}`);
+            });
+          return;
+        }
+
         setAppointments(initialAppointments);
         setCustomers(initialCustomers);
         setPackages(initialPackages);
@@ -385,6 +410,47 @@ export function useSalonStore() {
   }
 
   return store;
+}
+
+async function seedCloudDemoData(backendGateway: BackendGateway): Promise<SalonDataSnapshot> {
+  const customers = backendGateway.createCustomer
+    ? await Promise.all(initialCustomers.map((customer) => backendGateway.createCustomer?.(customer) ?? customer))
+    : initialCustomers;
+
+  const salonServices = backendGateway.createSalonService
+    ? await Promise.all(initialSalonServices.map((service) => backendGateway.createSalonService?.(service) ?? service))
+    : initialSalonServices;
+
+  const staffMembers = backendGateway.createStaffMember
+    ? await Promise.all(initialStaffMembers.map((staffMember) => backendGateway.createStaffMember?.(staffMember) ?? staffMember))
+    : initialStaffMembers;
+
+  const inventoryItems = backendGateway.createInventoryItem
+    ? await Promise.all(initialInventoryItems.map((item) => backendGateway.createInventoryItem?.(item) ?? item))
+    : initialInventoryItems;
+
+  const packages = backendGateway.createPackage
+    ? await Promise.all(initialPackages.map((servicePackage) => backendGateway.createPackage?.(servicePackage) ?? servicePackage))
+    : initialPackages;
+
+  const payments = backendGateway.createPayment
+    ? await Promise.all(initialPayments.map((payment) => backendGateway.createPayment?.(payment) ?? payment))
+    : initialPayments;
+
+  const appointments = backendGateway.createAppointment
+    ? await Promise.all(initialAppointments.map((appointment) => backendGateway.createAppointment?.(appointment) ?? appointment))
+    : initialAppointments;
+
+  return {
+    appointments,
+    customers,
+    packages,
+    payments,
+    salonServices,
+    staffMembers,
+    bookingRequests: [],
+    inventoryItems
+  };
 }
 
 function getErrorMessage(error: unknown) {

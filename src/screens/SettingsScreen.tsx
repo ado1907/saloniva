@@ -106,7 +106,7 @@ export function SettingsScreen({ account, onNavigate }: Props) {
             <SettingsRow icon="shield-checkmark-outline" title="Gizlilik Politikası" subtitle="Toplanan veriler, kullanım amacı ve saklama süreci açıklanır." badge="Aç" onPress={() => setLegalModal("privacy")} />
             <SettingsRow icon="document-text-outline" title="Kullanım Koşulları" subtitle="Saloniva kullanım şartları ve abonelik süreçleri burada yayınlanır." badge="Aç" onPress={() => setLegalModal("terms")} />
             <SettingsRow icon="mail-outline" title="Destek İletişimi" subtitle="Mağaza incelemesi ve kullanıcı desteği için destek e-postası gerekir." badge="Aç" onPress={() => setLegalModal("support")} />
-            <SettingsRow icon="save-outline" title="Kalıcı Veri" subtitle="Randevu, müşteri, ödeme ve paket verileri cihazda saklanır." badge={storageReady ? "Aktif" : "Yükleniyor"} />
+            <SettingsRow icon="save-outline" title="Kalıcı Veri" subtitle="Demo modda cihazda, bulut modda Supabase üzerinde salon bazlı saklanır." badge={storageReady ? "Aktif" : "Yükleniyor"} />
             <SettingsRow icon="trash-outline" title="Hesap Silme Talebi" subtitle="Salon hesabı ve verilerin silinmesi için görünür talep akışı." badge="Aç" danger onPress={() => setLegalModal("delete")} />
             <View style={styles.resetAction}>
               <ActionButton icon="refresh-outline" label="Demo Veriye Sıfırla" onPress={resetDemoData} />

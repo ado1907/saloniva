@@ -31,6 +31,9 @@ export type BackendGateway = {
   updateCustomer?: (customerId: string, customer: Partial<Customer>) => Promise<Customer>;
   createPackage?: (servicePackage: ServicePackage) => Promise<ServicePackage>;
   createPayment?: (payment: Payment) => Promise<Payment>;
+  createSalonService?: (service: SalonService) => Promise<SalonService>;
+  createStaffMember?: (staffMember: StaffMember) => Promise<StaffMember>;
+  createInventoryItem?: (item: InventoryItem) => Promise<InventoryItem>;
 };
 
 export const backendGatewayPlan = [

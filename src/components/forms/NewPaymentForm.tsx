@@ -39,34 +39,35 @@ export function NewPaymentForm({ onDone, initialCustomer = "", initialService = 
     const selectedCustomer = customers.find((item) => item.name === customer);
     const baseRemaining = initialRemaining ?? selectedCustomer?.debt;
     if (baseRemaining !== undefined) {
-      const nextRemaining = Math.max(0, baseRemaining - (Number(value) || 0));
+      const nextRemaining = Math.max(0, baseRemaining - parseMoney(value));
       setRemaining(String(nextRemaining));
       setStatus(nextRemaining > 0 ? "Kısmi Ödendi" : "Ödendi");
     }
   };
 
   const submit = () => {
+    const numericAmount = parseMoney(amount);
+    const numericRemaining = parseMoney(remaining);
+
     if (!customer.trim()) {
-      setError("Ödeme kaydetmek için müşteri seçilmeli veya yazılmalı.");
+      setError("Tahsilatı kaydetmek için müşteri seçin veya müşteri adını yazın.");
       return;
     }
 
     if (!service.trim()) {
-      setError("Ödemenin hangi hizmet veya paket için alındığı yazılmalı.");
+      setError("Tahsilatın hangi hizmet ya da paket için alındığını belirtin.");
       return;
     }
 
-    if (Number(amount) <= 0) {
-      setError("Alınan tutar 0'dan büyük olmalı.");
+    if (numericAmount <= 0) {
+      setError("Alınan tutar 0 TL'den büyük olmalı.");
       return;
     }
 
-    if (Number(remaining) < 0) {
-      setError("Kalan ödeme negatif olamaz.");
+    if (numericRemaining < 0) {
+      setError("Kalan ödeme negatif olamaz. Tutarı tekrar kontrol edin.");
       return;
     }
-
-    const numericAmount = Number(amount) || 0;
 
     addPayment({
       id: `pay-${Date.now()}`,
@@ -76,7 +77,7 @@ export function NewPaymentForm({ onDone, initialCustomer = "", initialService = 
       amount: numericAmount,
       method,
       status,
-      remaining: Number(remaining) || 0
+      remaining: numericRemaining
     });
     addPackagePayment(service.trim(), customer.trim(), numericAmount);
     setError(null);
@@ -122,4 +123,10 @@ export function NewPaymentForm({ onDone, initialCustomer = "", initialService = 
       </View>
     </View>
   );
+}
+
+function parseMoney(value: string) {
+  const normalized = value.replace(/\./g, "").replace(",", ".").trim();
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : 0;
 }

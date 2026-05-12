@@ -58,27 +58,27 @@ export function NewAppointmentForm({ onDone }: Props) {
     const endTime = normalizeTimeInput(end || "10:00");
 
     if (!customer.trim()) {
-      setError("Randevu kaydetmek için müşteri adı gerekli.");
+      setError("Randevuyu kaydetmek için müşteri adını girin.");
       return;
     }
 
     if (!service.trim()) {
-      setError("Randevu kaydetmek için hizmet seçilmeli veya yazılmalı.");
+      setError("Randevunun hangi hizmet için oluşturulduğunu seçin veya yazın.");
       return;
     }
 
     if (!isValidTime(startTime)) {
-      setError("Başlangıç saati 14:30 gibi geçerli bir formatta olmalı.");
+      setError("Başlangıç saatini 14:30 formatında girin. 1430 veya 14.30 da kabul edilir.");
       return;
     }
 
     if (!isValidTime(endTime)) {
-      setError("Bitiş saati 15:30 gibi geçerli bir formatta olmalı.");
+      setError("Bitiş saatini 15:30 formatında girin.");
       return;
     }
 
     if (timeToMinutes(endTime) <= timeToMinutes(startTime)) {
-      setError("Bitiş saati başlangıç saatinden sonra olmalı.");
+      setError("Bitiş saati başlangıç saatinden sonra olmalı. Lütfen saat aralığını kontrol edin.");
       return;
     }
 
@@ -91,12 +91,12 @@ export function NewAppointmentForm({ onDone }: Props) {
     });
 
     if (hasConflict) {
-      setError(`${staff.trim() || "Seçili personel"} için bu saat aralığında başka bir randevu var.`);
+      setError(`${staff.trim() || "Seçili personel"} için bu saat aralığı dolu görünüyor. Farklı bir saat seçin.`);
       return;
     }
 
     if (price && Number(price) < 0) {
-      setError("Ücret negatif olamaz.");
+      setError("Randevu ücreti negatif olamaz.");
       return;
     }
 

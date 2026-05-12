@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Saloniva White-Label Satış Dosyası</title>
+    <style>
+      :root {
+        --ink: #1f211c;
+        --sage: #405947;
+        --sage-soft: #e4ede3;
+        --cream: #fffaf2;
+        --paper: #fffefb;
+        --border: #ded4c5;
+        --gold: #a77f49;
+        --muted: #71695d;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: #f7f3ec;
+        color: var(--ink);
+        font-family: Inter, Arial, sans-serif;
+        line-height: 1.5;
+      }
+
+      .page {
+        width: min(960px, calc(100% - 32px));
+        margin: 32px auto;
+        background: var(--paper);
+        border: 1px solid var(--border);
+        box-shadow: 0 24px 60px rgba(43, 38, 29, 0.12);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.25fr 0.75fr;
+        gap: 28px;
+        padding: 44px;
+        background: linear-gradient(135deg, #fffefb 0%, #f3eadc 100%);
+      }
+
+      .mark {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--sage);
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .logo {
+        display: grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 8px;
+        background: var(--sage);
+        color: white;
+        font-weight: 900;
+      }
+
+      h1 {
+        margin: 28px 0 12px;
+        font-size: 46px;
+        line-height: 1.05;
+        letter-spacing: 0;
+      }
+
+      .lead {
+        max-width: 620px;
+        color: var(--muted);
+        font-size: 18px;
+      }
+
+      .visual {
+        min-height: 300px;
+        border-radius: 8px;
+        background:
+          linear-gradient(rgba(31, 33, 28, 0.06), rgba(31, 33, 28, 0.3)),
+          url("https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1000&q=80");
+        background-position: center;
+        background-size: cover;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 28px;
+      }
+
+      .stat,
+      .card {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.72);
+        padding: 16px;
+      }
+
+      .stat strong {
+        display: block;
+        color: var(--sage);
+        font-size: 28px;
+      }
+
+      .stat span,
+      .card p,
+      li {
+        color: var(--muted);
+      }
+
+      .content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        padding: 0 44px 44px;
+      }
+
+      h2 {
+        margin: 0 0 10px;
+        color: var(--sage);
+        font-size: 18px;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      .price {
+        grid-column: 1 / -1;
+        background: var(--sage);
+        color: white;
+      }
+
+      .price h2,
+      .price p {
+        color: white;
+      }
+
+      .price-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .price-box {
+        border: 1px solid rgba(255, 255, 255, 0.26);
+        border-radius: 8px;
+        padding: 14px;
+      }
+
+      .price-box strong {
+        display: block;
+        font-size: 20px;
+      }
+
+      .footer {
+        border-top: 1px solid var(--border);
+        padding: 18px 44px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      @media print {
+        body {
+          background: white;
+        }
+
+        .page {
+          width: 100%;
+          margin: 0;
+          box-shadow: none;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .hero,
+        .content,
+        .price-grid,
+        .stats {
+          grid-template-columns: 1fr;
+        }
+
+        h1 {
+          font-size: 34px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div>
+          <div class="mark"><span class="logo">S</span> Saloniva</div>
+          <h1>Premium güzellik salonları için white-label yönetim uygulaması.</h1>
+          <p class="lead">
+            Saloniva; randevu, müşteri, paket, ödeme ve operasyon takibini tek panelde toplayan,
+            markanıza özel sunulabilen web, Android ve iOS uyumlu salon yönetim çözümüdür.
+          </p>
+          <div class="stats">
+            <div class="stat"><strong>Web</strong><span>Yönetim paneli</span></div>
+            <div class="stat"><strong>iOS</strong><span>Mağaza hazırlığı</span></div>
+            <div class="stat"><strong>Android</strong><span>Mağaza hazırlığı</span></div>
+          </div>
+        </div>
+        <div class="visual" aria-label="Premium spa atmosferi"></div>
+      </section>
+
+      <section class="content">
+        <div class="card">
+          <h2>Kimler İçin?</h2>
+          <ul>
+            <li>Güzellik merkezleri</li>
+            <li>Premium kuaför ve bakım salonları</li>
+            <li>Estetik ve kişisel bakım işletmeleri</li>
+            <li>Franchise salon markaları</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>Öne Çıkan Modüller</h2>
+          <ul>
+            <li>Randevu takvimi ve personel akışı</li>
+            <li>Müşteri hafızası ve özel notlar</li>
+            <li>Paket, seans ve ödeme takibi</li>
+            <li>Bulut hesap ve salon bazlı veri ayrımı</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>Satış Avantajı</h2>
+          <p>
+            Saloniva, işletmeye kendi markasıyla profesyonel bir dijital ürün sunma imkanı verir.
+            Kaynak kod devri yerine kullanım lisansı ve white-label teslim modeliyle satılabilir.
+          </p>
+        </div>
+        <div class="card">
+          <h2>Teknik Durum</h2>
+          <p>
+            Supabase auth, cloud veri yazma ve salon bazlı RLS veri ayrımı test edilmiştir.
+            Üretim öncesinde ödeme sistemi, mağaza görselleri ve hukuki sayfalar tamamlanır.
+          </p>
+        </div>
+        <div class="card price">
+          <h2>Önerilen Paketleme</h2>
+          <p>Fiyatlar marka kapsamı, teslim modeli ve destek süresine göre netleştirilir.</p>
+          <div class="price-grid">
+            <div class="price-box"><strong>35-60K TL</strong><span>Demo / başlangıç lisansı</span></div>
+            <div class="price-box"><strong>75-140K TL</strong><span>Profesyonel white-label</span></div>
+            <div class="price-box"><strong>180K TL+</strong><span>Zincir / franchise kapsamı</span></div>
+          </div>
+        </div>
+      </section>
+      <footer class="footer">
+        Saloniva satış dosyası. Bu doküman ticari sunum içindir; nihai lisans ve teslim şartları sözleşmeyle belirlenir.
+      </footer>
+    </main>
+  </body>
+</html>
