@@ -149,6 +149,18 @@ export async function registerSalonWithSupabase(payload: RegisterSalonPayload) {
   return mapCloudAccount(account, authPayload.access_token, authPayload.refresh_token);
 }
 
+export async function requestPasswordResetWithSupabase(email: string) {
+  assertAuthConfigured();
+
+  const response = await fetch(`${supabaseConfig.url}/auth/v1/recover`, {
+    method: "POST",
+    headers: buildAuthHeaders(),
+    body: JSON.stringify({ email: email.trim() })
+  });
+
+  await parseAuthResponse(response);
+}
+
 export const supabaseAuthReadiness = [
   "Supabase Email Auth aktif olmalı.",
   "Test aşamasında Email Confirm kapalı olursa kayıt sonrası direkt giriş yapılır.",

@@ -73,6 +73,8 @@ Gizli `service_role` anahtari uygulamaya, GitHub'a veya README'ye konulmaz.
 - [E-posta ve WhatsApp satis metinleri](./docs/sales-assets/outreach-templates.md)
 - [Gorsel HTML/PDF satis dosyasi](./docs/sales-assets/saloniva-one-pager.html)
 - [Uretim eksigi listesi](./docs/sales-assets/production-gap-list.md)
+- [Uretim ilerleme notu](./docs/sales-assets/production-progress-2026-05-12.md)
+- [Hukuki sayfa hazirligi](./docs/legal-pages.md)
 - [White-label satis paketi](./docs/white-label-sales-kit/README.md)
 - [Fiyat teklif sablonu](./docs/white-label-sales-kit/03-price-quote-template.md)
 
@@ -126,14 +128,15 @@ Tamamlananlar:
 - Gercek kullanici kaydi, cikis ve tekrar giris test edildi.
 - Randevu, musteri ve odeme cloud yazma testi yapildi.
 - Iki farkli salon icin veri ayrimi/RLS testi gecti.
+- Sifre sifirlama e-postasi istemci akisi eklendi.
+- App Store / Google Play icin temel icon, adaptive icon ve splash varliklari eklendi.
 - GitHub push akisi tamamlandi.
 
 Satis oncesi kalan kritik basliklar:
 
-- Sifre sifirlama
-- Hesap silme web linki
-- Gizlilik politikasi ve destek sayfasi yayini
+- Supabase sifre sifirlama redirect URL ve e-posta sablonu canli domain ile ayarlanacak.
+- Hesap silme web linki gercek yayina alinacak.
+- Gizlilik politikasi ve destek sayfasi gercek web sitesinde yayinlanacak.
 - Abonelik/odeme sistemi
-- App Store / Google Play ikon, splash ve ekran goruntuleri
+- App Store / Google Play ekran goruntuleri ve final marka assetleri
 - Gercek cihazlarda mobil tasma ve form testi
-

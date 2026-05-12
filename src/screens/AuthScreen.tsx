@@ -6,7 +6,7 @@ import { BrandMark } from "../components/BrandMark";
 import { LuxuryProductScene } from "../components/LuxuryVisual";
 import { Pill } from "../components/Pill";
 import { createRegisteredSalonSession, type AuthSession } from "../services/authGateway";
-import { registerSalonWithSupabase, signInWithSupabase } from "../services/supabaseAuthGateway";
+import { registerSalonWithSupabase, requestPasswordResetWithSupabase, signInWithSupabase } from "../services/supabaseAuthGateway";
 import { supabaseConfig } from "../services/supabaseConfig";
 import { colors } from "../theme/colors";
 import { radius } from "../theme/spacing";
@@ -58,6 +58,33 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
     void runAuthAction(async () => {
       return signInWithSupabase(email, password);
     }, "Giriş başarılı.");
+  };
+
+  const requestPasswordReset = async () => {
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail) {
+      setAuthStatus("Şifre sıfırlama bağlantısı için e-posta adresinizi girin.");
+      return;
+    }
+
+    if (!supabaseConfig.configured) {
+      setAuthStatus("Şifre sıfırlama canlı Supabase bağlantısı açıldığında e-posta ile gönderilir.");
+      return;
+    }
+
+    setIsAuthLoading(true);
+    setAuthStatus("Şifre sıfırlama bağlantısı hazırlanıyor...");
+
+    try {
+      await requestPasswordResetWithSupabase(trimmedEmail);
+      setAuthStatus("Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Şifre sıfırlama bağlantısı gönderilemedi.";
+      setAuthStatus(message);
+    } finally {
+      setIsAuthLoading(false);
+    }
   };
 
   const createSalon = () => {
@@ -115,6 +142,7 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
           setRole={setRole}
           onDemoLogin={onDemoLogin}
           loginWithCloud={loginWithCloud}
+          requestPasswordReset={requestPasswordReset}
           createSalon={createSalon}
           authStatus={authStatus}
           isAuthLoading={isAuthLoading}
@@ -187,6 +215,7 @@ function AuthCard({
   setRole,
   onDemoLogin,
   loginWithCloud,
+  requestPasswordReset,
   authStatus,
   isAuthLoading,
   createSalon
@@ -205,6 +234,7 @@ function AuthCard({
   setRole: (role: UserRole) => void;
   onDemoLogin: () => void;
   loginWithCloud: () => void;
+  requestPasswordReset: () => void;
   authStatus: string | null;
   isAuthLoading: boolean;
   createSalon: () => void;
@@ -231,6 +261,9 @@ function AuthCard({
               primary
               onPress={loginWithCloud}
             />
+            <Pressable onPress={requestPasswordReset} style={styles.forgotButton}>
+              <Text style={styles.forgotText}>Şifremi unuttum</Text>
+            </Pressable>
             <Pressable onPress={onDemoLogin} style={styles.demoButton}>
               <Text style={styles.demoText}>Demo hesapla incele</Text>
             </Pressable>
@@ -533,6 +566,15 @@ const styles = StyleSheet.create({
     minHeight: 40,
     alignItems: "center",
     justifyContent: "center"
+  },
+  forgotButton: {
+    minHeight: 36,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  forgotText: {
+    color: colors.mutedDark,
+    fontWeight: "800"
   },
   demoText: {
     color: colors.accent,

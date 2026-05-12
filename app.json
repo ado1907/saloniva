@@ -6,6 +6,12 @@
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "scheme": "saloniva",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F7F0E6"
+    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -15,7 +21,11 @@
     },
     "android": {
       "package": "com.saloniva.app",
-      "permissions": []
+      "permissions": [],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#F7F0E6"
+      }
     },
     "web": {
       "bundler": "metro"

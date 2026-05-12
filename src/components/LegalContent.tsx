@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
+import { productConfig } from "../config/productConfig";
 import { colors } from "../theme/colors";
 import { radius } from "../theme/spacing";
 
@@ -13,9 +14,10 @@ const content: Record<LegalType, { title: string; paragraphs: string[] }> = {
     title: "Gizlilik Politikası",
     paragraphs: [
       "Saloniva; salon adı, kullanıcı e-postası, müşteri adı, telefon, randevu, paket, seans, ödeme ve not bilgilerini salon yönetimi amacıyla işler.",
-      "İlk sürümde veriler cihazda kalıcı olarak saklanır. Gerçek sunucu sürümünde veriler güvenli API ve yetkilendirme katmanı ile korunmalıdır.",
-      "Müşteri verileri üçüncü taraflarla satış veya reklam amacıyla paylaşılmaz. WhatsApp mesajı kullanıcı onayıyla cihazdaki bağlantı üzerinden açılır.",
-      "Kullanıcılar ayarlar bölümünden hesap silme talebi oluşturabilmeli ve destek kanalı üzerinden verilerinin silinmesini isteyebilmelidir."
+      "Demo modda veriler cihazda saklanabilir. Supabase modda veriler salon bazlı yetkilendirme ve RLS politikalarıyla korunur.",
+      "Müşteri verileri satış veya reklam amacıyla üçüncü taraflarla paylaşılmaz. WhatsApp mesajı kullanıcı onayıyla cihazdaki bağlantı üzerinden açılır.",
+      `Gizlilik sayfası: ${productConfig.privacyUrl}`,
+      "Kullanıcılar ayarlar bölümünden hesap silme talebi ve destek süreci hakkında bilgi alabilir."
     ]
   },
   terms: {
@@ -24,16 +26,17 @@ const content: Record<LegalType, { title: string; paragraphs: string[] }> = {
       "Saloniva, güzellik salonlarının randevu, müşteri, paket, personel ve ödeme süreçlerini yönetmesine yardımcı olan bir işletme aracıdır.",
       "Kullanıcı, sisteme eklediği müşteri verilerinin doğruluğundan ve bu verileri yasal izinlerle işlediğinden sorumludur.",
       "Fiyatlandırma, abonelik planı ve destek kapsamı web sitesinde veya satış sözleşmesinde ayrıca belirtilir.",
+      `Kullanım koşulları: ${productConfig.termsUrl}`,
       "Demo veriler temsilidir; gerçek finansal kayıt veya muhasebe belgesi yerine geçmez."
     ]
   },
   support: {
     title: "Destek İletişimi",
     paragraphs: [
-      "Destek e-postası: destek@saloniva.app",
+      `Destek e-postası: ${productConfig.supportEmail}`,
+      `Destek sayfası: ${productConfig.supportUrl}`,
       "Destek kapsamı: kurulum, hesap erişimi, veri yönetimi, mağaza sürümü, hata bildirimi ve kullanım soruları.",
-      "Mağaza yayın sürecinde App Store ve Google Play inceleme ekipleri için demo hesap bilgileri sağlanmalıdır.",
-      "Acil destek için ileride WhatsApp destek hattı veya web destek formu eklenebilir."
+      "Mağaza yayın sürecinde App Store ve Google Play inceleme ekipleri için demo hesap bilgileri sağlanmalıdır."
     ]
   },
   delete: {
@@ -41,8 +44,9 @@ const content: Record<LegalType, { title: string; paragraphs: string[] }> = {
     paragraphs: [
       "Salon sahibi, ayarlar bölümünden hesap ve salon verilerinin silinmesi için talep oluşturabilmelidir.",
       "Silme talebi; salon hesabı, kullanıcı hesabı, müşteri kayıtları, randevular, paketler, ödeme kayıtları ve notları kapsar.",
-      "Gerçek sunucu sürümünde silme talebi destek ekibine iletilmeli, işlem durumu kullanıcıya e-posta ile bildirilmelidir.",
-      "Bu demo sürümünde 'Demo Veriye Sıfırla' butonu cihazdaki yerel verileri temizlemek için kullanılabilir."
+      `Hesap silme web linki: ${productConfig.deleteAccountUrl}`,
+      "Canlı sürümde silme talebi destek ekibine iletilmeli, işlem durumu kullanıcıya e-posta ile bildirilmelidir.",
+      "Demo modda 'Demo Veriye Sıfırla' butonu yerel demo verileri temizlemek veya boş bulut salonunu demo verilerle doldurmak için kullanılır."
     ]
   }
 };
@@ -85,3 +89,4 @@ const styles = StyleSheet.create({
     lineHeight: 21
   }
 });
+
