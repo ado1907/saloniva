@@ -26,6 +26,11 @@ export type BackendGateway = {
   mode: BackendMode;
   loadSalonData: () => Promise<SalonDataSnapshot | null>;
   saveSalonData: (snapshot: SalonDataSnapshot) => Promise<void>;
+  createAppointment?: (appointment: Appointment) => Promise<Appointment>;
+  createCustomer?: (customer: Customer) => Promise<Customer>;
+  updateCustomer?: (customerId: string, customer: Partial<Customer>) => Promise<Customer>;
+  createPackage?: (servicePackage: ServicePackage) => Promise<ServicePackage>;
+  createPayment?: (payment: Payment) => Promise<Payment>;
 };
 
 export const backendGatewayPlan = [

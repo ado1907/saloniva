@@ -54,6 +54,9 @@ export function NewAppointmentForm({ onDone }: Props) {
   };
 
   const submit = () => {
+    const startTime = normalizeTimeInput(time);
+    const endTime = normalizeTimeInput(end || "10:00");
+
     if (!customer.trim()) {
       setError("Randevu kaydetmek için müşteri adı gerekli.");
       return;
@@ -64,17 +67,17 @@ export function NewAppointmentForm({ onDone }: Props) {
       return;
     }
 
-    if (!isValidTime(time.trim())) {
+    if (!isValidTime(startTime)) {
       setError("Başlangıç saati 14:30 gibi geçerli bir formatta olmalı.");
       return;
     }
 
-    if (!isValidTime((end || "10:00").trim())) {
+    if (!isValidTime(endTime)) {
       setError("Bitiş saati 15:30 gibi geçerli bir formatta olmalı.");
       return;
     }
 
-    if (timeToMinutes(end || "10:00") <= timeToMinutes(time)) {
+    if (timeToMinutes(endTime) <= timeToMinutes(startTime)) {
       setError("Bitiş saati başlangıç saatinden sonra olmalı.");
       return;
     }
@@ -84,7 +87,7 @@ export function NewAppointmentForm({ onDone }: Props) {
         return false;
       }
 
-      return timeRangesOverlap(time, end || "10:00", appointment.time, appointment.end);
+      return timeRangesOverlap(startTime, endTime, appointment.time, appointment.end);
     });
 
     if (hasConflict) {
@@ -99,8 +102,8 @@ export function NewAppointmentForm({ onDone }: Props) {
 
     addAppointment({
       id: `a-${Date.now()}`,
-      time: time.trim() || "09:00",
-      end: end.trim() || "10:00",
+      time: startTime,
+      end: endTime,
       customer: customer.trim() || "Yeni Müşteri",
       phone: phone.trim().replace(/\D/g, "") || "905320000000",
       service: service.trim() || "Genel Hizmet",
@@ -197,8 +200,29 @@ function isValidTime(value: string) {
   return /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 }
 
+function normalizeTimeInput(value: string) {
+  const cleaned = value
+    .trim()
+    .replace(/[：٫؛;]/g, ":")
+    .replace(".", ":")
+    .replace(/\s/g, "");
+
+  if (/^\d{3,4}$/.test(cleaned)) {
+    const minute = cleaned.slice(-2);
+    const hour = cleaned.slice(0, -2).padStart(2, "0");
+    return `${hour}:${minute}`;
+  }
+
+  const match = cleaned.match(/^(\d{1,2}):(\d{1,2})$/);
+  if (!match) {
+    return cleaned;
+  }
+
+  return `${match[1].padStart(2, "0")}:${match[2].padStart(2, "0")}`;
+}
+
 function timeToMinutes(value: string) {
-  const [hour, minute] = value.split(":").map(Number);
+  const [hour, minute] = normalizeTimeInput(value).split(":").map(Number);
   return hour * 60 + minute;
 }
 

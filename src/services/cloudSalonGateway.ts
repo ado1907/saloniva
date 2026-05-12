@@ -35,7 +35,16 @@ function asString(value: unknown, fallback = "") {
 }
 
 function asNumber(value: unknown, fallback = 0) {
-  return typeof value === "number" ? value : fallback;
+  if (typeof value === "number") {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  }
+
+  return fallback;
 }
 
 function asBoolean(value: unknown, fallback = false) {
@@ -149,6 +158,86 @@ function mapBookingRequest(row: CloudRow): BookingRequest {
   };
 }
 
+function customerPayload(customer: Customer, salonId: string) {
+  return {
+    salon_id: salonId,
+    name: customer.name,
+    phone: customer.phone,
+    last_visit: customer.lastVisit,
+    total_spent: customer.totalSpent,
+    debt: customer.debt,
+    package_label: customer.packageLabel,
+    note: customer.note
+  };
+}
+
+function customerUpdatePayload(customer: Partial<Customer>) {
+  const payload: CloudRow = {};
+
+  if (typeof customer.name === "string") {
+    payload.name = customer.name;
+  }
+  if (typeof customer.phone === "string") {
+    payload.phone = customer.phone;
+  }
+  if (typeof customer.lastVisit === "string") {
+    payload.last_visit = customer.lastVisit;
+  }
+  if (typeof customer.totalSpent === "number") {
+    payload.total_spent = customer.totalSpent;
+  }
+  if (typeof customer.debt === "number") {
+    payload.debt = customer.debt;
+  }
+  if (typeof customer.packageLabel === "string") {
+    payload.package_label = customer.packageLabel;
+  }
+  if (typeof customer.note === "string") {
+    payload.note = customer.note;
+  }
+
+  return payload;
+}
+
+function appointmentPayload(appointment: Appointment, salonId: string) {
+  return {
+    salon_id: salonId,
+    customer_name: appointment.customer,
+    phone: appointment.phone,
+    service_name: appointment.service,
+    staff_name: appointment.staff,
+    starts_at: appointment.time,
+    ends_at: appointment.end,
+    price: appointment.price,
+    status: appointment.status
+  };
+}
+
+function packagePayload(servicePackage: ServicePackage, salonId: string) {
+  return {
+    salon_id: salonId,
+    customer_name: servicePackage.customer,
+    title: servicePackage.title,
+    total_sessions: servicePackage.totalSessions,
+    used_sessions: servicePackage.usedSessions,
+    total_price: servicePackage.totalPrice,
+    paid: servicePackage.paid
+  };
+}
+
+function paymentPayload(payment: Payment, salonId: string) {
+  return {
+    salon_id: salonId,
+    customer_name: payment.customer,
+    service_name: payment.service,
+    paid_at: payment.date,
+    amount: payment.amount,
+    method: payment.method,
+    status: payment.status,
+    remaining: payment.remaining
+  };
+}
+
 export function createCloudSalonGateway(options: CloudGatewayOptions): BackendGateway {
   return {
     mode: "cloud-ready",
@@ -157,7 +246,11 @@ export function createCloudSalonGateway(options: CloudGatewayOptions): BackendGa
         return emptySnapshot;
       }
 
-      const requestOptions = { accessToken: options.accessToken, order: "created_at.desc" };
+      const requestOptions = {
+        accessToken: options.accessToken,
+        order: "created_at.desc",
+        eq: { salon_id: options.salonId }
+      };
       const [
         appointments,
         customers,
@@ -193,6 +286,47 @@ export function createCloudSalonGateway(options: CloudGatewayOptions): BackendGa
       throw new Error(
         "Cloud save henüz toplu senkronizasyon için açılmadı. Canlı geçişte her form kendi güvenli insert/update isteğini kullanmalı."
       );
+    },
+    async createAppointment(appointment) {
+      const rows = await supabaseRestClient.insert<CloudRow>(
+        "appointments",
+        appointmentPayload(appointment, options.salonId),
+        { accessToken: options.accessToken }
+      );
+      return mapAppointment(rows[0] ?? {});
+    },
+    async createCustomer(customer) {
+      const rows = await supabaseRestClient.insert<CloudRow>(
+        "customers",
+        customerPayload(customer, options.salonId),
+        { accessToken: options.accessToken }
+      );
+      return mapCustomer(rows[0] ?? {});
+    },
+    async updateCustomer(customerId, customer) {
+      const rows = await supabaseRestClient.patch<CloudRow>(
+        "customers",
+        customerId,
+        customerUpdatePayload(customer),
+        { accessToken: options.accessToken, eq: { salon_id: options.salonId } }
+      );
+      return mapCustomer(rows[0] ?? {});
+    },
+    async createPackage(servicePackage) {
+      const rows = await supabaseRestClient.insert<CloudRow>(
+        "service_packages",
+        packagePayload(servicePackage, options.salonId),
+        { accessToken: options.accessToken }
+      );
+      return mapPackage(rows[0] ?? {});
+    },
+    async createPayment(payment) {
+      const rows = await supabaseRestClient.insert<CloudRow>(
+        "payments",
+        paymentPayload(payment, options.salonId),
+        { accessToken: options.accessToken }
+      );
+      return mapPayment(rows[0] ?? {});
     }
   };
 }

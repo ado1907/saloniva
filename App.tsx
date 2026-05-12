@@ -38,7 +38,7 @@ import { SalesOpportunitiesScreen } from "./src/screens/SalesOpportunitiesScreen
 import { StaffScreen } from "./src/screens/StaffScreen";
 import { AppPreferencesProvider, useAppPreferences } from "./src/state/AppPreferences";
 import { SalonStoreProvider } from "./src/state/SalonStore";
-import { productConfig } from "./src/config/productConfig";
+import { createDemoAuthSession, type AuthSession } from "./src/services/authGateway";
 import { colors } from "./src/theme/colors";
 import { typography } from "./src/theme/typography";
 import type { SalonAccount, TabKey } from "./src/types";
@@ -57,33 +57,25 @@ export default function App() {
 
 function SalonivaApp() {
   const [activeTab, setActiveTab] = useState<TabKey>("panel");
-  const [account, setAccount] = useState<SalonAccount | null>(null);
+  const [session, setSession] = useState<AuthSession | null>(null);
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
   const [utilityModal, setUtilityModal] = useState<UtilityModal>(null);
   const [paymentDraft, setPaymentDraft] = useState<PaymentDraft>(null);
   const { width } = useWindowDimensions();
   const { isDarkMode } = useAppPreferences();
   const isWide = width >= 900;
+  const account = session?.account ?? null;
+  const isCloudSession = Boolean(session?.accessToken && session.accessToken !== "demo-access-token");
 
   const enterDemo = () => {
-    setAccount({
-      salonId: productConfig.demoAccount.salonId,
-      salonName: "Saloniva Güzellik",
-      ownerName: "Demo Kullanıcı",
-      email: "demo@saloniva.app",
-      role: "Salon Sahibi",
-      planId: productConfig.demoAccount.planId,
-      subscriptionStatus: productConfig.demoAccount.subscriptionStatus,
-      trialEndsAt: productConfig.demoAccount.trialEndsAt,
-      permissions: [...productConfig.demoAccount.permissions]
-    });
+    setSession(createDemoAuthSession());
   };
 
   if (!account) {
     return (
       <SafeAreaView style={[styles.safe, isDarkMode ? styles.safeDark : null]}>
         <StatusBar style={isDarkMode ? "light" : "dark"} />
-        <AuthScreen onDemoLogin={enterDemo} onCreateSalon={setAccount} />
+        <AuthScreen onDemoLogin={enterDemo} onCreateSalon={setSession} />
       </SafeAreaView>
     );
   }
@@ -91,14 +83,15 @@ function SalonivaApp() {
   return (
     <SafeAreaView style={[styles.safe, isDarkMode ? styles.safeDark : null]}>
       <StatusBar style={isDarkMode ? "light" : "dark"} />
-      <SalonStoreProvider>
+      <SalonStoreProvider session={session}>
         <View style={[styles.shell, isDarkMode ? styles.shellDark : null]}>
           {isWide ? <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} /> : null}
           <View style={[styles.content, isDarkMode ? styles.contentDark : null]}>
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
               <Header
                 account={account}
-                onLogout={() => setAccount(null)}
+                isCloudSession={isCloudSession}
+                onLogout={() => setSession(null)}
                 onNewAppointment={() => setActiveModal("appointment")}
                 onNewCustomer={() => setActiveModal("customer")}
                 onNewPayment={() => {
@@ -175,6 +168,7 @@ function SalonivaApp() {
 
 function Header({
   account,
+  isCloudSession,
   onLogout,
   onNewAppointment,
   onNewCustomer,
@@ -182,6 +176,7 @@ function Header({
   onSearch
 }: {
   account: SalonAccount;
+  isCloudSession: boolean;
   onLogout: () => void;
   onNewAppointment: () => void;
   onNewCustomer: () => void;
@@ -196,7 +191,7 @@ function Header({
         <Text style={[styles.eyebrow, isDarkMode ? styles.eyebrowDark : null]}>{account.salonName}</Text>
         <Text style={[styles.title, isDarkMode ? styles.titleDark : null]}>{t("todayFlow")}</Text>
         <Text style={[styles.subtitle, isDarkMode ? styles.subtitleDark : null]}>
-          9 Mayıs 2026 Cumartesi • {account.ownerName} • {account.role}
+          9 Mayıs 2026 Cumartesi • {account.ownerName} • {account.role} • {isCloudSession ? "Bulut aktif" : "Demo local"}
         </Text>
       </View>
       <View style={styles.headerActions}>

@@ -5,16 +5,16 @@ import { AnimatedText } from "../components/AnimatedText";
 import { BrandMark } from "../components/BrandMark";
 import { LuxuryProductScene } from "../components/LuxuryVisual";
 import { Pill } from "../components/Pill";
-import { productConfig } from "../config/productConfig";
+import { createRegisteredSalonSession, type AuthSession } from "../services/authGateway";
 import { registerSalonWithSupabase, signInWithSupabase } from "../services/supabaseAuthGateway";
 import { supabaseConfig } from "../services/supabaseConfig";
 import { colors } from "../theme/colors";
 import { radius } from "../theme/spacing";
-import type { SalonAccount, UserRole } from "../types";
+import type { UserRole } from "../types";
 
 type Props = {
   onDemoLogin: () => void;
-  onCreateSalon: (account: SalonAccount) => void;
+  onCreateSalon: (session: AuthSession) => void;
 };
 
 type AuthMode = "login" | "create";
@@ -38,14 +38,14 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
   const [authStatus, setAuthStatus] = useState<string | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
 
-  const runAuthAction = async (action: () => Promise<SalonAccount>, successMessage: string) => {
+  const runAuthAction = async (action: () => Promise<AuthSession>, successMessage: string) => {
     setIsAuthLoading(true);
     setAuthStatus("Supabase ile güvenli bağlantı kuruluyor...");
 
     try {
-      const account = await action();
+      const session = await action();
       setAuthStatus(successMessage);
-      onCreateSalon(account);
+      onCreateSalon(session);
     } catch (error) {
       const message = error instanceof Error ? error.message : "İşlem tamamlanamadı.";
       setAuthStatus(message);
@@ -56,37 +56,27 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
 
   const loginWithCloud = () => {
     void runAuthAction(async () => {
-      const session = await signInWithSupabase(email, password);
-      return session.account;
+      return signInWithSupabase(email, password);
     }, "Giriş başarılı.");
   };
 
   const createSalon = () => {
+    const fallbackPayload = {
+      salonName,
+      ownerName,
+      email,
+      password,
+      role,
+      planId: "starter" as const
+    };
+
     if (!supabaseConfig.configured) {
-      onCreateSalon({
-        salonId: `salon-${Date.now()}`,
-        salonName: salonName.trim() || "Yeni Salon",
-        ownerName: ownerName.trim() || "Salon Yetkilisi",
-        email: email.trim() || "demo@saloniva.app",
-        role,
-        planId: "starter",
-        subscriptionStatus: "Deneme",
-        trialEndsAt: "14 gün sonra",
-        permissions: [...productConfig.demoAccount.permissions]
-      });
+      onCreateSalon(createRegisteredSalonSession(fallbackPayload));
       return;
     }
 
     void runAuthAction(async () => {
-      const session = await registerSalonWithSupabase({
-        salonName,
-        ownerName,
-        email,
-        password,
-        role,
-        planId: "starter"
-      });
-      return session.account;
+      return registerSalonWithSupabase(fallbackPayload);
     }, "Salon hesabı oluşturuldu.");
   };
 

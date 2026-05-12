@@ -7,6 +7,7 @@ export type SupabaseQueryOptions = {
   select?: string;
   order?: string;
   limit?: number;
+  eq?: Record<string, string | number | boolean>;
 };
 
 function buildHeaders(accessToken?: string) {
@@ -37,6 +38,10 @@ function buildUrl(table: string, options: SupabaseQueryOptions = {}) {
   if (typeof options.limit === "number") {
     url.searchParams.set("limit", String(options.limit));
   }
+
+  Object.entries(options.eq ?? {}).forEach(([key, value]) => {
+    url.searchParams.set(key, `eq.${String(value)}`);
+  });
 
   return url.toString();
 }

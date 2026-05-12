@@ -9,6 +9,8 @@ import {
   staffMembers as initialStaffMembers
 } from "../data/demoData";
 import { createDemoBackendGateway } from "../services/backendGateway";
+import { createCloudSalonGateway } from "../services/cloudSalonGateway";
+import type { AuthSession } from "../services/authGateway";
 import type { Appointment, AppointmentStatus, BookingRequest, Customer, InventoryItem, Payment, SalonService, ServicePackage, StaffMember } from "../types";
 import { clearSalonState, loadSalonState, saveSalonState } from "./storage";
 
@@ -50,9 +52,8 @@ type SalonStore = {
 };
 
 const SalonContext = createContext<SalonStore | null>(null);
-const backendGateway = createDemoBackendGateway(loadSalonState, saveSalonState);
 
-export function SalonStoreProvider({ children }: { children: ReactNode }) {
+export function SalonStoreProvider({ children, session }: { children: ReactNode; session: AuthSession | null }) {
   const [appointments, setAppointments] = useState(initialAppointments);
   const [customers, setCustomers] = useState(initialCustomers);
   const [packages, setPackages] = useState(initialPackages);
@@ -63,9 +64,34 @@ export function SalonStoreProvider({ children }: { children: ReactNode }) {
   const [inventoryItems, setInventoryItems] = useState(initialInventoryItems);
   const [storageReady, setStorageReady] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const backendGateway = useMemo(() => {
+    const isCloudSession = Boolean(session?.accessToken && session.accessToken !== "demo-access-token");
+
+    if (isCloudSession && session) {
+      return createCloudSalonGateway({
+        salonId: session.account.salonId,
+        accessToken: session.accessToken
+      });
+    }
+
+    return createDemoBackendGateway(loadSalonState, saveSalonState);
+  }, [session]);
 
   useEffect(() => {
     let mounted = true;
+
+    setStorageReady(false);
+
+    if (backendGateway.mode === "cloud-ready") {
+      setAppointments([]);
+      setCustomers([]);
+      setPackages([]);
+      setPayments([]);
+      setSalonServices([]);
+      setStaffMembers([]);
+      setBookingRequests([]);
+      setInventoryItems([]);
+    }
 
     backendGateway
       .loadSalonData()
@@ -87,6 +113,11 @@ export function SalonStoreProvider({ children }: { children: ReactNode }) {
             : initialInventoryItems
         );
       })
+      .catch((error) => {
+        if (mounted) {
+          setNotice(`Salon verileri yüklenemedi: ${getErrorMessage(error)}`);
+        }
+      })
       .finally(() => {
         if (mounted) {
           setStorageReady(true);
@@ -96,10 +127,14 @@ export function SalonStoreProvider({ children }: { children: ReactNode }) {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [backendGateway]);
 
   useEffect(() => {
     if (!storageReady) {
+      return;
+    }
+
+    if (backendGateway.mode === "cloud-ready") {
       return;
     }
 
@@ -113,7 +148,7 @@ export function SalonStoreProvider({ children }: { children: ReactNode }) {
       bookingRequests,
       inventoryItems
     });
-  }, [appointments, bookingRequests, customers, inventoryItems, packages, payments, salonServices, staffMembers, storageReady]);
+  }, [appointments, backendGateway, bookingRequests, customers, inventoryItems, packages, payments, salonServices, staffMembers, storageReady]);
 
   const totals = useMemo(() => {
     const expectedRevenue = appointments.reduce((sum, item) => sum + item.price, 0);
@@ -147,10 +182,30 @@ export function SalonStoreProvider({ children }: { children: ReactNode }) {
       addAppointment: (appointment) => {
         setAppointments((current) => [appointment, ...current]);
         setNotice("Randevu kaydedildi.");
+        if (backendGateway.createAppointment) {
+          void backendGateway
+            .createAppointment(appointment)
+            .then((savedAppointment) => {
+              setAppointments((current) =>
+                current.map((item) => (item.id === appointment.id ? savedAppointment : item))
+              );
+              setNotice("Randevu buluta kaydedildi.");
+            })
+            .catch((error) => setNotice(`Randevu buluta kaydedilemedi: ${getErrorMessage(error)}`));
+        }
       },
       addCustomer: (customer) => {
         setCustomers((current) => [customer, ...current]);
         setNotice("Müşteri kaydedildi.");
+        if (backendGateway.createCustomer) {
+          void backendGateway
+            .createCustomer(customer)
+            .then((savedCustomer) => {
+              setCustomers((current) => current.map((item) => (item.id === customer.id ? savedCustomer : item)));
+              setNotice("Müşteri buluta kaydedildi.");
+            })
+            .catch((error) => setNotice(`Müşteri buluta kaydedilemedi: ${getErrorMessage(error)}`));
+        }
       },
       addCustomerNote: (customerId, text) => {
         setCustomers((current) =>
@@ -168,8 +223,20 @@ export function SalonStoreProvider({ children }: { children: ReactNode }) {
       addPackage: (servicePackage) => {
         setPackages((current) => [servicePackage, ...current]);
         setNotice("Paket müşteriye tanımlandı.");
+        if (backendGateway.createPackage) {
+          void backendGateway
+            .createPackage(servicePackage)
+            .then((savedPackage) => {
+              setPackages((current) =>
+                current.map((item) => (item.id === servicePackage.id ? savedPackage : item))
+              );
+              setNotice("Paket buluta kaydedildi.");
+            })
+            .catch((error) => setNotice(`Paket buluta kaydedilemedi: ${getErrorMessage(error)}`));
+        }
       },
       addPayment: (payment) => {
+        const matchedCustomer = customers.find((customer) => customer.name === payment.customer);
         setPayments((current) => [payment, ...current]);
         setCustomers((current) =>
           current.map((customer) =>
@@ -177,6 +244,25 @@ export function SalonStoreProvider({ children }: { children: ReactNode }) {
           )
         );
         setNotice("Ödeme kaydedildi ve müşteri borcu güncellendi.");
+        if (backendGateway.createPayment) {
+          void backendGateway
+            .createPayment(payment)
+            .then((savedPayment) => {
+              setPayments((current) => current.map((item) => (item.id === payment.id ? savedPayment : item)));
+              setNotice("Ödeme buluta kaydedildi.");
+            })
+            .catch((error) => setNotice(`Ödeme buluta kaydedilemedi: ${getErrorMessage(error)}`));
+        }
+        if (matchedCustomer && backendGateway.updateCustomer) {
+          void backendGateway
+            .updateCustomer(matchedCustomer.id, { ...matchedCustomer, debt: payment.remaining })
+            .then((savedCustomer) => {
+              setCustomers((current) =>
+                current.map((customer) => (customer.id === matchedCustomer.id ? savedCustomer : customer))
+              );
+            })
+            .catch((error) => setNotice(`Müşteri borcu bulutta güncellenemedi: ${getErrorMessage(error)}`));
+        }
       },
       addPackagePayment: (packageTitle, customer, amount) => {
         setPackages((current) =>
@@ -285,7 +371,7 @@ export function SalonStoreProvider({ children }: { children: ReactNode }) {
         setNotice(delta > 0 ? "Stok miktarı artırıldı." : "Stok kullanımı kaydedildi.");
       }
     }),
-    [appointments, bookingRequests, customers, inventoryItems, notice, packages, payments, salonServices, staffMembers, storageReady, totals]
+    [appointments, backendGateway, bookingRequests, customers, inventoryItems, notice, packages, payments, salonServices, staffMembers, storageReady, totals]
   );
 
   return <SalonContext.Provider value={value}>{children}</SalonContext.Provider>;
@@ -299,6 +385,10 @@ export function useSalonStore() {
   }
 
   return store;
+}
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Bilinmeyen hata";
 }
 
 function addMinutesToTime(value: string, minutes: number) {

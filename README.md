@@ -67,6 +67,10 @@ Sifre: demo1234
 
 ## Proje Yapisi
 
+Hızlı dosya haritası için:
+
+[PROJECT_MAP.md](./PROJECT_MAP.md)
+
 ```text
 src/
   components/  Ortak UI parcalari
@@ -146,6 +150,7 @@ Canli satis icin tamamlanacak ana basliklar:
 - [Magaza Hazirligi](./docs/store-readiness.md)
 - [Ajan Calisma Sirasi](./docs/agent-workflow.md)
 - [Guvenlik Taramasi](./docs/security-review.md)
+- [White-Label Satis Paketi](./docs/white-label-sales-kit/README.md)
 
 ## Not
 
