@@ -76,6 +76,7 @@ Sifre sifirlama icin Supabase > Authentication > URL Configuration alaninda:
 ## Satis Materyalleri
 
 - [1 dakikalik demo ekran akisi](./docs/sales-assets/demo-video-screen-flow.md)
+- [Demo hesap satis hikayesi](./docs/sales-assets/demo-account-story.md)
 - [E-posta ve WhatsApp satis metinleri](./docs/sales-assets/outreach-templates.md)
 - [Gorsel HTML/PDF satis dosyasi](./docs/sales-assets/saloniva-one-pager.html)
 - [Uretim eksigi listesi](./docs/sales-assets/production-gap-list.md)

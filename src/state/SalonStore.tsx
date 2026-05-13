@@ -1,6 +1,7 @@
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import {
   appointments as initialAppointments,
+  bookingRequests as initialBookingRequests,
   customers as initialCustomers,
   inventoryItems as initialInventoryItems,
   packages as initialPackages,
@@ -60,7 +61,7 @@ export function SalonStoreProvider({ children, session }: { children: ReactNode;
   const [payments, setPayments] = useState(initialPayments);
   const [salonServices, setSalonServices] = useState(initialSalonServices);
   const [staffMembers, setStaffMembers] = useState(initialStaffMembers);
-  const [bookingRequests, setBookingRequests] = useState<BookingRequest[]>([]);
+  const [bookingRequests, setBookingRequests] = useState<BookingRequest[]>(initialBookingRequests);
   const [inventoryItems, setInventoryItems] = useState(initialInventoryItems);
   const [storageReady, setStorageReady] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -106,7 +107,7 @@ export function SalonStoreProvider({ children, session }: { children: ReactNode;
         setPayments(storedState.payments);
         setSalonServices(storedState.salonServices);
         setStaffMembers(storedState.staffMembers);
-        setBookingRequests(storedState.bookingRequests ?? []);
+        setBookingRequests(storedState.bookingRequests ?? initialBookingRequests);
         setInventoryItems(
           storedState.inventoryItems && storedState.inventoryItems.length > 0
             ? storedState.inventoryItems
@@ -343,7 +344,7 @@ export function SalonStoreProvider({ children, session }: { children: ReactNode;
         setPayments(initialPayments);
         setSalonServices(initialSalonServices);
         setStaffMembers(initialStaffMembers);
-        setBookingRequests([]);
+        setBookingRequests(initialBookingRequests);
         setInventoryItems(initialInventoryItems);
         void clearSalonState();
         setNotice("Demo veriler sıfırlandı.");
@@ -448,7 +449,7 @@ async function seedCloudDemoData(backendGateway: BackendGateway): Promise<SalonD
     payments,
     salonServices,
     staffMembers,
-    bookingRequests: [],
+    bookingRequests: initialBookingRequests,
     inventoryItems
   };
 }

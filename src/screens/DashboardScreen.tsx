@@ -21,6 +21,7 @@ type Props = {
 export function DashboardScreen({ isWide }: Props) {
   const { appointments, markAppointmentCompleted, totals, updateAppointmentStatus } = useSalonStore();
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const plannedAppointments = appointments.filter((appointment) => appointment.status === "Planlandı").length;
 
   return (
     <View style={styles.sectionGap}>
@@ -28,7 +29,7 @@ export function DashboardScreen({ isWide }: Props) {
       <BusinessSnapshot />
       <VisualMoodBoard />
       <View style={[styles.metricsGrid, isWide ? styles.metricsGridWide : null]}>
-        <PremiumTrendCard title="Bugünkü Randevu" value="18" detail={`${totals.completedAppointments} tamamlandı, 14 bekliyor`} points={[38, 52, 66, 82, 74, 92]} />
+        <PremiumTrendCard title="Bugünkü Randevu" value={`${appointments.length}`} detail={`${totals.completedAppointments} tamamlandı, ${plannedAppointments} bekliyor`} points={[38, 52, 66, 82, 74, 92]} />
         <PremiumTrendCard title="Bugünkü Gelir" value={formatCurrency(totals.expectedRevenue)} detail="Tahmini toplam" points={[30, 46, 42, 70, 78, 88]} tone="gold" />
         <PremiumTrendCard title="Bekleyen Ödeme" value={formatCurrency(totals.debt)} detail="Açık müşteri ödemesi" points={[78, 68, 55, 44, 38, 30]} />
         <PremiumTrendCard title="Gelmedi / İptal" value={`${totals.missedAppointments}`} detail="Bugünkü kayıp randevu" points={[18, 24, 15, 22, 12, 10]} tone="gold" />
