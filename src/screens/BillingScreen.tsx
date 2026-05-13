@@ -5,6 +5,7 @@ import { CompactRow } from "../components/CompactRow";
 import { PanelCard } from "../components/PanelCard";
 import { ScreenIntro } from "../components/ScreenIntro";
 import { productConfig } from "../config/productConfig";
+import { billingWebhookEvents, checkoutContracts, licenseAccessRules } from "../services/subscriptionGateway";
 import { colors } from "../theme/colors";
 import { radius } from "../theme/spacing";
 
@@ -56,6 +57,25 @@ export function BillingScreen() {
           <CompactRow title="Demo plan" subtitle="Profesyonel plan mağaza incelemesi ve müşteri demosu için aktif gösterilir." badge="Demo" />
           <CompactRow title="Deneme süresi" subtitle={`Deneme bitişi: ${productConfig.demoAccount.trialEndsAt}`} badge="Aktif" />
           <CompactRow title="Yetki kapsamı" subtitle={productConfig.demoAccount.permissions.join(", ")} badge={`${productConfig.demoAccount.permissions.length} yetki`} />
+        </PanelCard>
+      </View>
+
+      <View style={styles.columns}>
+        <PanelCard title="Checkout Sözleşmesi" style={styles.columnCard}>
+          {checkoutContracts.map((contract) => (
+            <CompactRow
+              key={contract.planId}
+              title={`${contract.planName} - ${contract.price}`}
+              subtitle={`${contract.checkoutPath} -> ${contract.successRedirect}`}
+              badge="Hazır"
+            />
+          ))}
+        </PanelCard>
+        <PanelCard title="Webhook ve Lisans Kuralları" style={styles.columnCard}>
+          {billingWebhookEvents.map((item) => (
+            <CompactRow key={item.event} title={item.event} subtitle={item.action} badge="Webhook" />
+          ))}
+          <CompactRow title="Past due kuralı" subtitle={licenseAccessRules.past_due} badge="Lisans" />
         </PanelCard>
       </View>
     </View>

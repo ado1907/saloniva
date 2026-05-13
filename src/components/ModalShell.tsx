@@ -1,4 +1,4 @@
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { Modal, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { ScrollView } from "react-native";
 import { colors } from "../theme/colors";
@@ -12,10 +12,13 @@ type Props = {
 };
 
 export function ModalShell({ visible, title, children, onClose }: Props) {
+  const { width } = useWindowDimensions();
+  const isCompact = width < 420;
+
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <View style={styles.backdrop}>
-        <View style={styles.sheet}>
+      <View style={[styles.backdrop, isCompact ? styles.backdropCompact : null]}>
+        <View style={[styles.sheet, isCompact ? styles.sheetCompact : null]}>
           <View style={styles.header}>
             <Text style={styles.title}>{title}</Text>
             <Pressable onPress={onClose} style={styles.closeButton}>
@@ -38,6 +41,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 16
   },
+  backdropCompact: {
+    padding: 8
+  },
   sheet: {
     width: "100%",
     maxWidth: 620,
@@ -49,6 +55,10 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     padding: 16,
     gap: 14
+  },
+  sheetCompact: {
+    maxHeight: "94%",
+    padding: 12
   },
   header: {
     flexDirection: "row",

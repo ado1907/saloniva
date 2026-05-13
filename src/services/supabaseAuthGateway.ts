@@ -155,7 +155,7 @@ export async function requestPasswordResetWithSupabase(email: string) {
   const response = await fetch(`${supabaseConfig.url}/auth/v1/recover`, {
     method: "POST",
     headers: buildAuthHeaders(),
-    body: JSON.stringify({ email: email.trim() })
+    body: JSON.stringify({ email: email.trim(), redirect_to: supabaseConfig.authRedirectUrl })
   });
 
   await parseAuthResponse(response);

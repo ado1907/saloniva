@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from "react-native";
 import { ActionButton } from "../components/ActionButton";
 import { AnimatedText } from "../components/AnimatedText";
 import { BrandMark } from "../components/BrandMark";
@@ -28,6 +28,8 @@ const proofPoints = [
 ];
 
 export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
+  const { width } = useWindowDimensions();
+  const isCompact = width < 420;
   const [mode, setMode] = useState<AuthMode>("login");
   const [view, setView] = useState<AuthView>("marketing");
   const [salonName, setSalonName] = useState("Saloniva Güzellik");
@@ -125,7 +127,7 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
       </View>
 
       {view === "marketing" ? (
-        <MarketingView onDemoLogin={onDemoLogin} onStart={() => setView("auth")} />
+        <MarketingView isCompact={isCompact} onDemoLogin={onDemoLogin} onStart={() => setView("auth")} />
       ) : (
         <AuthCard
           mode={mode}
@@ -152,7 +154,7 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
   );
 }
 
-function MarketingView({ onDemoLogin, onStart }: { onDemoLogin: () => void; onStart: () => void }) {
+function MarketingView({ isCompact, onDemoLogin, onStart }: { isCompact: boolean; onDemoLogin: () => void; onStart: () => void }) {
   return (
     <>
       <View style={styles.hero}>
@@ -164,7 +166,7 @@ function MarketingView({ onDemoLogin, onStart }: { onDemoLogin: () => void; onSt
               <Text style={styles.brandNote}>Premium salon işletim sistemi</Text>
             </View>
           </View>
-          <AnimatedText delay={110} style={styles.headline}>Salonunuzu web, Android ve iOS üzerinden tek hesapla yönetin.</AnimatedText>
+          <AnimatedText delay={110} style={[styles.headline, isCompact ? styles.headlineCompact : null]}>Salonunuzu web, Android ve iOS üzerinden tek hesapla yönetin.</AnimatedText>
           <Text style={styles.subline}>
             Randevu, müşteri, paket, seans ve ödeme takibini sade bir profesyonel panelde toplayın.
           </Text>
@@ -413,6 +415,10 @@ const styles = StyleSheet.create({
     fontSize: 34,
     fontWeight: "800",
     lineHeight: 42
+  },
+  headlineCompact: {
+    fontSize: 27,
+    lineHeight: 34
   },
   subline: {
     color: colors.muted,

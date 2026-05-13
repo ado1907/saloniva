@@ -49,9 +49,15 @@ EXPO_PUBLIC_BACKEND_MODE=supabase
 EXPO_PUBLIC_SUPABASE_URL=https://PROJECT_ID.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_xxx
 EXPO_PUBLIC_DEMO_SALON_ID=demo-saloniva
+EXPO_PUBLIC_AUTH_REDIRECT_URL=https://saloniva.app/auth/callback
 ```
 
 Gizli `service_role` anahtari uygulamaya, GitHub'a veya README'ye konulmaz.
+
+Sifre sifirlama icin Supabase > Authentication > URL Configuration alaninda:
+
+- Site URL: `https://saloniva.app`
+- Redirect URL: `https://saloniva.app/auth/callback`
 
 ## One Cikan Ozellikler
 
@@ -75,6 +81,11 @@ Gizli `service_role` anahtari uygulamaya, GitHub'a veya README'ye konulmaz.
 - [Uretim eksigi listesi](./docs/sales-assets/production-gap-list.md)
 - [Uretim ilerleme notu](./docs/sales-assets/production-progress-2026-05-12.md)
 - [Hukuki sayfa hazirligi](./docs/legal-pages.md)
+- [Yayina hazir statik web sayfalari](./docs/public-site/README.md)
+- [Mobil QA kontrol listesi](./docs/mobile-qa-checklist.md)
+- [Store ekran goruntusu plani](./docs/store-assets/screenshot-plan.md)
+- [Gercek cihaz test listesi](./docs/store-assets/real-device-test-checklist.md)
+- [Abonelik/odeme uygulama plani](./docs/billing-implementation-plan.md)
 - [White-label satis paketi](./docs/white-label-sales-kit/README.md)
 - [Fiyat teklif sablonu](./docs/white-label-sales-kit/03-price-quote-template.md)
 

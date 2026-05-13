@@ -58,7 +58,7 @@ export const formStyles = StyleSheet.create({
   },
   grow: {
     flex: 1,
-    minWidth: 160
+    minWidth: 132
   },
   actions: {
     flexDirection: "row",
@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
   },
   input: {
     minHeight: 44,
+    minWidth: 0,
     borderRadius: radius.sm,
     borderWidth: 1,
     borderColor: colors.border,
