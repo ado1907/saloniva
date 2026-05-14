@@ -15,7 +15,7 @@ Bu proje GitHub'a yuklenirken `node_modules` klasoru yuklenmemelidir. GitHub'a s
 Komut satirinda bu klasorde olmalisin:
 
 ```bash
-C:\Users\ASUS\Documents\Codex\2026-05-06\bana-eker-hastalar-ve-tansiyon-hastlar
+C:\Users\ASUS\Documents\Codex\2026-05-06\saloniva
 ```
 
 ## 3. Git Komutlari
