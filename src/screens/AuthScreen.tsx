@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from "react-native";
+import { ImageBackground, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from "react-native";
 import { ActionButton } from "../components/ActionButton";
-import { AnimatedText } from "../components/AnimatedText";
 import { BrandMark } from "../components/BrandMark";
-import { LuxuryProductScene } from "../components/LuxuryVisual";
 import { Pill } from "../components/Pill";
+import { productConfig } from "../config/productConfig";
+import { visualAssets } from "../config/visualAssets";
 import { createRegisteredSalonSession, type AuthSession } from "../services/authGateway";
 import { registerSalonWithSupabase, requestPasswordResetWithSupabase, signInWithSupabase } from "../services/supabaseAuthGateway";
 import { supabaseConfig } from "../services/supabaseConfig";
@@ -21,15 +21,19 @@ type AuthMode = "login" | "create";
 type AuthView = "auth" | "marketing";
 
 const roles: UserRole[] = ["Salon Sahibi", "Yönetici", "Personel"];
-const proofPoints = [
-  ["Bulut", "Supabase hazır"],
-  ["Güvenlik", "RLS temeli"],
-  ["Platform", "Web / iOS / Android"]
+
+const demoSignals = [
+  { label: "Bugünkü akış", value: "9 randevu", detail: "6 bekleyen seans" },
+  { label: "Tahsilat", value: "10.350 TL", detail: "açık bakiye" },
+  { label: "Satış fırsatı", value: "3 paket", detail: "yenileme adayı" }
 ];
+
+const demoFlow = ["Karar paneli", "Randevu takvimi", "Müşteri hafızası", "Tahsilat ve paket"];
 
 export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
   const { width } = useWindowDimensions();
-  const isCompact = width < 420;
+  const isNarrow = width < 900;
+  const isCompact = width < 430;
   const [mode, setMode] = useState<AuthMode>("login");
   const [view, setView] = useState<AuthView>("marketing");
   const [salonName, setSalonName] = useState("Saloniva Güzellik");
@@ -50,16 +54,14 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
       onCreateSalon(session);
     } catch (error) {
       const message = error instanceof Error ? error.message : "İşlem tamamlanamadı.";
-      setAuthStatus(message);
+      setAuthStatus(formatAuthMessage(message));
     } finally {
       setIsAuthLoading(false);
     }
   };
 
   const loginWithCloud = () => {
-    void runAuthAction(async () => {
-      return signInWithSupabase(email, password);
-    }, "Giriş başarılı.");
+    void runAuthAction(async () => signInWithSupabase(email, password), "Giriş başarılı.");
   };
 
   const requestPasswordReset = async () => {
@@ -83,7 +85,7 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
       setAuthStatus("Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Şifre sıfırlama bağlantısı gönderilemedi.";
-      setAuthStatus(message);
+      setAuthStatus(formatAuthMessage(message));
     } finally {
       setIsAuthLoading(false);
     }
@@ -104,101 +106,134 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
       return;
     }
 
-    void runAuthAction(async () => {
-      return registerSalonWithSupabase(fallbackPayload);
-    }, "Salon hesabı oluşturuldu.");
+    void runAuthAction(async () => registerSalonWithSupabase(fallbackPayload), "Salon hesabı oluşturuldu.");
   };
 
   return (
     <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
-      <View style={styles.topNav}>
-        <View style={styles.navBrandRow}>
-          <BrandMark size="sm" />
-          <Text style={styles.navBrand}>Saloniva</Text>
+      <View style={styles.shell}>
+        <View style={styles.topNav}>
+          <View style={styles.navBrandRow}>
+            <BrandMark size="sm" />
+            <View>
+              <Text style={styles.navBrand}>Saloniva</Text>
+              <Text style={styles.navSub}>Premium salon işletim sistemi</Text>
+            </View>
+          </View>
+          <View style={styles.navActions}>
+            <NavButton label="Demo" active={view === "marketing"} onPress={() => setView("marketing")} />
+            <NavButton label="Giriş" active={view === "auth"} onPress={() => setView("auth")} />
+          </View>
         </View>
-        <View style={styles.navActions}>
-          <Pressable onPress={() => setView("marketing")} style={[styles.navButton, view === "marketing" ? styles.navButtonActive : null]}>
-            <Text style={[styles.navButtonText, view === "marketing" ? styles.navButtonTextActive : null]}>Tanıtım</Text>
-          </Pressable>
-          <Pressable onPress={() => setView("auth")} style={[styles.navButton, view === "auth" ? styles.navButtonActive : null]}>
-            <Text style={[styles.navButtonText, view === "auth" ? styles.navButtonTextActive : null]}>Giriş</Text>
-          </Pressable>
+
+        <View style={[styles.mainGrid, isNarrow ? styles.mainGridNarrow : null]}>
+          <HeroPanel isCompact={isCompact} onDemoLogin={onDemoLogin} onStart={() => setView("auth")} />
+          {view === "marketing" ? (
+            <DemoPanel onDemoLogin={onDemoLogin} onStart={() => setView("auth")} />
+          ) : (
+            <AuthCard
+              mode={mode}
+              setMode={setMode}
+              salonName={salonName}
+              setSalonName={setSalonName}
+              ownerName={ownerName}
+              setOwnerName={setOwnerName}
+              email={email}
+              setEmail={setEmail}
+              password={password}
+              setPassword={setPassword}
+              role={role}
+              setRole={setRole}
+              onDemoLogin={onDemoLogin}
+              loginWithCloud={loginWithCloud}
+              requestPasswordReset={requestPasswordReset}
+              createSalon={createSalon}
+              authStatus={authStatus}
+              isAuthLoading={isAuthLoading}
+            />
+          )}
         </View>
       </View>
-
-      {view === "marketing" ? (
-        <MarketingView isCompact={isCompact} onDemoLogin={onDemoLogin} onStart={() => setView("auth")} />
-      ) : (
-        <AuthCard
-          mode={mode}
-          setMode={setMode}
-          salonName={salonName}
-          setSalonName={setSalonName}
-          ownerName={ownerName}
-          setOwnerName={setOwnerName}
-          email={email}
-          setEmail={setEmail}
-          password={password}
-          setPassword={setPassword}
-          role={role}
-          setRole={setRole}
-          onDemoLogin={onDemoLogin}
-          loginWithCloud={loginWithCloud}
-          requestPasswordReset={requestPasswordReset}
-          createSalon={createSalon}
-          authStatus={authStatus}
-          isAuthLoading={isAuthLoading}
-        />
-      )}
     </ScrollView>
   );
 }
 
-function MarketingView({ isCompact, onDemoLogin, onStart }: { isCompact: boolean; onDemoLogin: () => void; onStart: () => void }) {
+function NavButton({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
   return (
-    <>
-      <View style={styles.hero}>
-        <View style={styles.heroCopy}>
-          <View style={styles.heroBrandRow}>
-            <BrandMark size="lg" />
-            <View>
-              <AnimatedText style={styles.brand}>Saloniva</AnimatedText>
-              <Text style={styles.brandNote}>Premium salon işletim sistemi</Text>
-            </View>
-          </View>
-          <AnimatedText delay={110} style={[styles.headline, isCompact ? styles.headlineCompact : null]}>Salonunuzu web, Android ve iOS üzerinden tek hesapla yönetin.</AnimatedText>
-          <Text style={styles.subline}>
-            Randevu, müşteri, paket, seans ve ödeme takibini sade bir profesyonel panelde toplayın.
+    <Pressable onPress={onPress} style={[styles.navButton, active ? styles.navButtonActive : null]}>
+      <Text style={[styles.navButtonText, active ? styles.navButtonTextActive : null]}>{label}</Text>
+    </Pressable>
+  );
+}
+
+function HeroPanel({ isCompact, onDemoLogin, onStart }: { isCompact: boolean; onDemoLogin: () => void; onStart: () => void }) {
+  return (
+    <ImageBackground source={{ uri: visualAssets.salonInterior }} resizeMode="cover" imageStyle={styles.heroImage} style={styles.heroPanel}>
+      <View style={styles.heroShade}>
+        <View style={styles.heroTopline}>
+          <Text style={styles.heroKicker}>Saloniva OS</Text>
+          <Text style={styles.heroBadge}>Web + iOS + Android</Text>
+        </View>
+
+        <View style={styles.heroContent}>
+          <Text style={[styles.heroTitle, isCompact ? styles.heroTitleCompact : null]}>
+            Salon sahibinin karar ekranı.
+          </Text>
+          <Text style={styles.heroCopy}>
+            Randevu, müşteri hafızası, paket yenileme ve tahsilat riskini tek bakışta gösteren premium güzellik salonu paneli.
           </Text>
           <View style={styles.heroActions}>
-            <ActionButton icon="play-circle-outline" label="Demo İncele" primary onPress={onDemoLogin} />
-            <ActionButton icon="business-outline" label="Salon Hesabı Aç" onPress={onStart} />
-          </View>
-          <View style={styles.proofGrid}>
-            {proofPoints.map(([label, value]) => (
-              <View key={label} style={styles.proofItem}>
-                <Text style={styles.proofLabel}>{label}</Text>
-                <Text style={styles.proofValue}>{value}</Text>
-              </View>
-            ))}
-          </View>
-          <View style={styles.featureGrid}>
-            <Feature title="Randevu Takvimi" text="Günlük akışı ve personel yoğunluğunu takip edin." />
-            <Feature title="Müşteri Hafızası" text="Geçmiş işlemler, notlar ve aktif paketler." />
-            <Feature title="Seans ve Ödeme" text="Kalan seansları ve açık borçları görün." />
+            <ActionButton icon="play-circle-outline" label="Demo Hesabı Aç" primary onPress={onDemoLogin} />
+            <ActionButton icon="business-outline" label="Salon Hesabı" onPress={onStart} />
           </View>
         </View>
-        <View style={styles.heroVisual}>
-          <LuxuryProductScene />
+
+        <View style={styles.signalRow}>
+          {demoSignals.map((signal) => (
+            <View key={signal.label} style={styles.signalBox}>
+              <Text style={styles.signalLabel}>{signal.label}</Text>
+              <Text style={styles.signalValue}>{signal.value}</Text>
+              <Text style={styles.signalDetail}>{signal.detail}</Text>
+            </View>
+          ))}
         </View>
+      </View>
+    </ImageBackground>
+  );
+}
+
+function DemoPanel({ onDemoLogin, onStart }: { onDemoLogin: () => void; onStart: () => void }) {
+  return (
+    <View style={styles.sidePanel}>
+      <View style={styles.sideHeader}>
+        <Text style={styles.sideKicker}>Canlı demo akışı</Text>
+        <Text style={styles.sideTitle}>Boş ekran değil, dolu salon operasyonu.</Text>
+        <Text style={styles.sideText}>
+          Demo hesabında VIP müşteri, açık tahsilat, online talep, paket yenileme ve stok riski hazır gelir.
+        </Text>
       </View>
 
-      <View style={styles.pricingGrid}>
-        <Plan title="Başlangıç" price="399 TL/ay" text="Tek kullanıcı, randevu ve müşteri takibi." />
-        <Plan title="Profesyonel" price="799 TL/ay" text="Paket, ödeme, personel ve rapor modülleri." featured />
-        <Plan title="Premium" price="1.299 TL/ay" text="Öncelikli destek, gelişmiş rapor ve çok şube hazırlığı." />
+      <View style={styles.flowList}>
+        {demoFlow.map((item, index) => (
+          <View key={item} style={styles.flowItem}>
+            <Text style={styles.flowNumber}>{index + 1}</Text>
+            <Text style={styles.flowText}>{item}</Text>
+          </View>
+        ))}
       </View>
-    </>
+
+      <View style={styles.readinessPanel}>
+        <Text style={styles.readinessTitle}>Satış vaadi</Text>
+        <Text style={styles.readinessText}>
+          “Salonunuzda hangi müşteri ödeme bekliyor, hangi paket bitiyor, hangi randevu riske giriyor?” sorusunu tek ekranda cevaplar.
+        </Text>
+      </View>
+
+      <View style={styles.sideActions}>
+        <ActionButton icon="play-circle-outline" label="Demo İncele" primary onPress={onDemoLogin} />
+        <ActionButton icon="arrow-forward-outline" label="Girişe Geç" onPress={onStart} />
+      </View>
+    </View>
   );
 }
 
@@ -242,90 +277,87 @@ function AuthCard({
   createSalon: () => void;
 }) {
   return (
-      <View style={styles.card}>
-        <View style={styles.modeSwitch}>
-          <Pressable style={[styles.modeButton, mode === "login" ? styles.modeButtonActive : null]} onPress={() => setMode("login")}>
-            <Text style={[styles.modeText, mode === "login" ? styles.modeTextActive : null]}>Giriş</Text>
-          </Pressable>
-          <Pressable style={[styles.modeButton, mode === "create" ? styles.modeButtonActive : null]} onPress={() => setMode("create")}>
-            <Text style={[styles.modeText, mode === "create" ? styles.modeTextActive : null]}>Salon Oluştur</Text>
-          </Pressable>
-        </View>
-
-        {mode === "login" ? (
-          <View style={styles.form}>
-            <Text style={styles.formTitle}>Salon hesabınıza giriş yapın</Text>
-            <TextInput value={email} onChangeText={setEmail} placeholder="E-posta" keyboardType="email-address" autoCapitalize="none" style={styles.input} />
-            <TextInput value={password} onChangeText={setPassword} placeholder="Şifre" secureTextEntry style={styles.input} />
-            <ActionButton
-              icon="log-in-outline"
-              label={isAuthLoading ? "Bağlanıyor" : "Giriş Yap"}
-              primary
-              onPress={loginWithCloud}
-            />
-            <Pressable onPress={requestPasswordReset} style={styles.forgotButton}>
-              <Text style={styles.forgotText}>Şifremi unuttum</Text>
-            </Pressable>
-            <Pressable onPress={onDemoLogin} style={styles.demoButton}>
-              <Text style={styles.demoText}>Demo hesapla incele</Text>
-            </Pressable>
-          </View>
-        ) : (
-          <View style={styles.form}>
-            <Text style={styles.formTitle}>Yeni salon hesabı oluşturun</Text>
-            <TextInput value={salonName} onChangeText={setSalonName} placeholder="Salon adı" style={styles.input} />
-            <TextInput value={ownerName} onChangeText={setOwnerName} placeholder="Yetkili adı" style={styles.input} />
-            <TextInput value={email} onChangeText={setEmail} placeholder="E-posta" keyboardType="email-address" autoCapitalize="none" style={styles.input} />
-            <TextInput value={password} onChangeText={setPassword} placeholder="Şifre" secureTextEntry style={styles.input} />
-            <View style={styles.roleRow}>
-              {roles.map((item) => (
-                <Pill key={item} label={item} active={role === item} onPress={() => setRole(item)} />
-              ))}
-            </View>
-            <ActionButton
-              icon="business-outline"
-              label={isAuthLoading ? "Oluşturuluyor" : "Salonu Oluştur"}
-              primary
-              onPress={createSalon}
-            />
-          </View>
-        )}
-
-        {authStatus ? <Text style={styles.statusText}>{authStatus}</Text> : null}
-
-        <Text style={styles.legalText}>
-          Devam ederek kullanım koşullarını, gizlilik politikasını ve hesap silme süreçlerini kabul etmiş olursunuz.
-        </Text>
+    <View style={styles.sidePanel}>
+      <View style={styles.modeSwitch}>
+        <Pressable style={[styles.modeButton, mode === "login" ? styles.modeButtonActive : null]} onPress={() => setMode("login")}>
+          <Text style={[styles.modeText, mode === "login" ? styles.modeTextActive : null]}>Giriş</Text>
+        </Pressable>
+        <Pressable style={[styles.modeButton, mode === "create" ? styles.modeButtonActive : null]} onPress={() => setMode("create")}>
+          <Text style={[styles.modeText, mode === "create" ? styles.modeTextActive : null]}>Salon Oluştur</Text>
+        </Pressable>
       </View>
-  );
-}
 
-function Feature({ title, text }: { title: string; text: string }) {
-  return (
-    <View style={styles.feature}>
-      <Text style={styles.featureTitle}>{title}</Text>
-      <Text style={styles.featureText}>{text}</Text>
+      {mode === "login" ? (
+        <View style={styles.form}>
+          <Text style={styles.formTitle}>Salon hesabınıza giriş yapın</Text>
+          <Text style={styles.formNote}>Bulut verileriniz ve salon paneliniz güvenli oturumla açılır.</Text>
+          <TextInput value={email} onChangeText={setEmail} placeholder="E-posta" keyboardType="email-address" autoCapitalize="none" style={styles.input} />
+          <TextInput value={password} onChangeText={setPassword} placeholder="Şifre" secureTextEntry style={styles.input} />
+          <ActionButton icon="log-in-outline" label={isAuthLoading ? "Bağlanıyor" : "Giriş Yap"} primary onPress={loginWithCloud} />
+          <View style={styles.authLinks}>
+            <Pressable onPress={requestPasswordReset} style={styles.linkButton}>
+              <Text style={styles.linkText}>Şifremi unuttum</Text>
+            </Pressable>
+            <Pressable onPress={onDemoLogin} style={styles.linkButton}>
+              <Text style={styles.linkTextAccent}>Demo hesapla incele</Text>
+            </Pressable>
+          </View>
+        </View>
+      ) : (
+        <View style={styles.form}>
+          <Text style={styles.formTitle}>Yeni salon hesabı oluşturun</Text>
+          <Text style={styles.formNote}>İlk salon, rol ve deneme planı tek akışta hazırlanır.</Text>
+          <TextInput value={salonName} onChangeText={setSalonName} placeholder="Salon adı" style={styles.input} />
+          <TextInput value={ownerName} onChangeText={setOwnerName} placeholder="Yetkili adı" style={styles.input} />
+          <TextInput value={email} onChangeText={setEmail} placeholder="E-posta" keyboardType="email-address" autoCapitalize="none" style={styles.input} />
+          <TextInput value={password} onChangeText={setPassword} placeholder="Şifre" secureTextEntry style={styles.input} />
+          <View style={styles.roleRow}>
+            {roles.map((item) => (
+              <Pill key={item} label={item} active={role === item} onPress={() => setRole(item)} />
+            ))}
+          </View>
+          <ActionButton icon="business-outline" label={isAuthLoading ? "Oluşturuluyor" : "Salonu Oluştur"} primary onPress={createSalon} />
+        </View>
+      )}
+
+      {authStatus ? <Text style={styles.statusText}>{authStatus}</Text> : null}
+
+      <View style={styles.planStrip}>
+        {productConfig.plans.slice(0, 3).map((plan) => (
+          <View key={plan.id} style={styles.planMini}>
+            <Text style={styles.planName}>{plan.name}</Text>
+            <Text style={styles.planPrice}>{plan.price}</Text>
+          </View>
+        ))}
+      </View>
+
+      <Text style={styles.legalText}>
+        Devam ederek kullanım koşullarını, gizlilik politikasını ve hesap silme süreçlerini kabul etmiş olursunuz.
+      </Text>
     </View>
   );
 }
 
-function Plan({ title, price, text, featured }: { title: string; price: string; text: string; featured?: boolean }) {
-  return (
-    <View style={[styles.plan, featured ? styles.planFeatured : null]}>
-      <Text style={styles.planTitle}>{title}</Text>
-      <Text style={styles.planPrice}>{price}</Text>
-      <Text style={styles.planText}>{text}</Text>
-    </View>
-  );
+function formatAuthMessage(message: string) {
+  if (message.toLowerCase().includes("invalid login credentials")) {
+    return "E-posta veya şifre hatalı. Bilgileri kontrol edin ya da şifre sıfırlama bağlantısı isteyin.";
+  }
+
+  return message;
 }
 
 const styles = StyleSheet.create({
   page: {
     flexGrow: 1,
     backgroundColor: colors.background,
-    padding: 18,
-    gap: 18,
+    padding: 16,
     justifyContent: "center"
+  },
+  shell: {
+    width: "100%",
+    maxWidth: 1180,
+    alignSelf: "center",
+    gap: 14
   },
   topNav: {
     borderRadius: radius.sm,
@@ -338,24 +370,30 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 12
   },
-  navBrand: {
-    color: colors.text,
-    fontWeight: "800",
-    fontSize: 18
-  },
   navBrandRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10
+    gap: 10,
+    flexShrink: 1
+  },
+  navBrand: {
+    color: colors.text,
+    fontWeight: "900",
+    fontSize: 18
+  },
+  navSub: {
+    color: colors.muted,
+    fontSize: 12,
+    fontWeight: "700"
   },
   navActions: {
     flexDirection: "row",
     gap: 6
   },
   navButton: {
-    minHeight: 34,
+    minHeight: 36,
     borderRadius: radius.sm,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     alignItems: "center",
     justifyContent: "center"
   },
@@ -364,155 +402,120 @@ const styles = StyleSheet.create({
   },
   navButtonText: {
     color: colors.mutedDark,
-    fontWeight: "800"
+    fontWeight: "900"
   },
   navButtonTextActive: {
     color: colors.accent
   },
-  hero: {
+  mainGrid: {
+    flexDirection: "row",
+    gap: 14,
+    alignItems: "stretch"
+  },
+  mainGridNarrow: {
+    flexDirection: "column"
+  },
+  heroPanel: {
+    flex: 1.45,
+    minHeight: 620,
+    overflow: "hidden",
     borderRadius: radius.sm,
-    backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.softBorder,
-    padding: 22,
-    gap: 20,
+    backgroundColor: colors.ink
+  },
+  heroImage: {
+    borderRadius: radius.sm
+  },
+  heroShade: {
+    flex: 1,
+    padding: 24,
+    justifyContent: "space-between",
+    backgroundColor: "rgba(13, 15, 12, 0.46)",
+    gap: 22
+  },
+  heroTopline: {
     flexDirection: "row",
     flexWrap: "wrap",
-    alignItems: "stretch",
-    shadowColor: colors.shadow,
-    shadowOpacity: 1,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 2
-  },
-  heroCopy: {
-    flex: 1.15,
-    minWidth: 280,
-    gap: 12
-  },
-  heroVisual: {
-    flex: 0.85,
-    minWidth: 260
-  },
-  heroBrandRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 13
-  },
-  brand: {
-    color: colors.accent,
-    fontSize: 16,
-    fontWeight: "800",
-    textTransform: "uppercase"
-  },
-  brandNote: {
-    color: colors.muted,
-    fontWeight: "700",
-    marginTop: 4
-  },
-  headline: {
-    color: colors.text,
-    fontSize: 34,
-    fontWeight: "800",
-    lineHeight: 42
-  },
-  headlineCompact: {
-    fontSize: 27,
-    lineHeight: 34
-  },
-  subline: {
-    color: colors.muted,
-    fontSize: 16,
-    lineHeight: 24
-  },
-  heroActions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    justifyContent: "space-between",
     gap: 10
   },
-  proofGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8
+  heroKicker: {
+    color: colors.white,
+    fontWeight: "900",
+    textTransform: "uppercase",
+    letterSpacing: 1
   },
-  proofItem: {
-    flex: 1,
-    minWidth: 130,
-    borderRadius: radius.sm,
+  heroBadge: {
+    color: colors.white,
+    fontWeight: "800",
     borderWidth: 1,
-    borderColor: colors.softBorder,
-    backgroundColor: colors.accentSofter,
-    padding: 11
+    borderColor: "rgba(255,255,255,0.38)",
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: "rgba(255,255,255,0.12)"
   },
-  proofLabel: {
-    color: colors.muted,
-    fontSize: 12,
-    fontWeight: "800",
-    textTransform: "uppercase"
+  heroContent: {
+    maxWidth: 620,
+    gap: 14
   },
-  proofValue: {
-    color: colors.text,
-    fontWeight: "800",
-    marginTop: 4
+  heroTitle: {
+    color: colors.white,
+    fontSize: 50,
+    lineHeight: 58,
+    fontWeight: "900"
   },
-  featureGrid: {
+  heroTitleCompact: {
+    fontSize: 34,
+    lineHeight: 41
+  },
+  heroCopy: {
+    color: "rgba(255,255,255,0.88)",
+    fontSize: 17,
+    lineHeight: 26,
+    maxWidth: 560
+  },
+  heroActions: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 10,
     marginTop: 4
   },
-  feature: {
-    flex: 1,
-    minWidth: 170,
-    borderRadius: radius.sm,
-    borderWidth: 1,
-    borderColor: colors.softBorder,
-    backgroundColor: colors.surface,
-    padding: 13
-  },
-  featureTitle: {
-    color: colors.text,
-    fontWeight: "800"
-  },
-  featureText: {
-    color: colors.muted,
-    marginTop: 5,
-    lineHeight: 19
-  },
-  pricingGrid: {
+  signalRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12
+    gap: 10
   },
-  plan: {
+  signalBox: {
     flex: 1,
-    minWidth: 190,
+    minWidth: 145,
     borderRadius: radius.sm,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-    padding: 16,
-    gap: 7
+    borderColor: "rgba(255,255,255,0.22)",
+    backgroundColor: "rgba(255,255,255,0.14)",
+    padding: 13
   },
-  planFeatured: {
-    borderColor: colors.accent,
-    backgroundColor: colors.accentSoft
-  },
-  planTitle: {
-    color: colors.text,
+  signalLabel: {
+    color: "rgba(255,255,255,0.74)",
     fontWeight: "800",
-    fontSize: 17
+    fontSize: 12,
+    textTransform: "uppercase"
   },
-  planPrice: {
-    color: colors.accent,
-    fontWeight: "800",
-    fontSize: 22
+  signalValue: {
+    color: colors.white,
+    fontWeight: "900",
+    fontSize: 22,
+    marginTop: 6
   },
-  planText: {
-    color: colors.muted,
-    lineHeight: 20
+  signalDetail: {
+    color: "rgba(255,255,255,0.78)",
+    marginTop: 4,
+    lineHeight: 18
   },
-  card: {
+  sidePanel: {
+    flex: 0.85,
+    minWidth: 310,
     borderRadius: radius.sm,
     backgroundColor: colors.card,
     borderWidth: 1,
@@ -521,9 +524,78 @@ const styles = StyleSheet.create({
     gap: 16,
     shadowColor: colors.shadow,
     shadowOpacity: 1,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
     elevation: 2
+  },
+  sideHeader: {
+    gap: 8
+  },
+  sideKicker: {
+    color: colors.champagne,
+    fontWeight: "900",
+    textTransform: "uppercase",
+    fontSize: 12
+  },
+  sideTitle: {
+    color: colors.text,
+    fontSize: 27,
+    lineHeight: 34,
+    fontWeight: "900"
+  },
+  sideText: {
+    color: colors.muted,
+    lineHeight: 22
+  },
+  flowList: {
+    gap: 9
+  },
+  flowItem: {
+    minHeight: 48,
+    borderRadius: radius.sm,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.softBorder,
+    padding: 11,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10
+  },
+  flowNumber: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: colors.accent,
+    color: colors.white,
+    textAlign: "center",
+    lineHeight: 26,
+    fontWeight: "900"
+  },
+  flowText: {
+    color: colors.text,
+    fontWeight: "800",
+    flex: 1
+  },
+  readinessPanel: {
+    borderRadius: radius.sm,
+    backgroundColor: colors.accentSofter,
+    borderWidth: 1,
+    borderColor: colors.sageSoft,
+    padding: 14,
+    gap: 7
+  },
+  readinessTitle: {
+    color: colors.accent,
+    fontWeight: "900"
+  },
+  readinessText: {
+    color: colors.mutedDark,
+    lineHeight: 21
+  },
+  sideActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 9
   },
   modeSwitch: {
     minHeight: 44,
@@ -545,7 +617,7 @@ const styles = StyleSheet.create({
   },
   modeText: {
     color: colors.mutedDark,
-    fontWeight: "800"
+    fontWeight: "900"
   },
   modeTextActive: {
     color: colors.accent
@@ -555,12 +627,18 @@ const styles = StyleSheet.create({
   },
   formTitle: {
     color: colors.text,
-    fontSize: 20,
-    fontWeight: "800",
-    marginBottom: 4
+    fontSize: 24,
+    lineHeight: 31,
+    fontWeight: "900"
+  },
+  formNote: {
+    color: colors.muted,
+    lineHeight: 20,
+    marginBottom: 2
   },
   input: {
-    minHeight: 46,
+    minHeight: 48,
+    minWidth: 0,
     borderRadius: radius.sm,
     borderWidth: 1,
     borderColor: colors.border,
@@ -568,23 +646,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 13,
     color: colors.text
   },
-  demoButton: {
-    minHeight: 40,
-    alignItems: "center",
-    justifyContent: "center"
+  authLinks: {
+    gap: 4
   },
-  forgotButton: {
+  linkButton: {
     minHeight: 36,
     alignItems: "center",
     justifyContent: "center"
   },
-  forgotText: {
+  linkText: {
     color: colors.mutedDark,
-    fontWeight: "800"
+    fontWeight: "900"
   },
-  demoText: {
+  linkTextAccent: {
     color: colors.accent,
-    fontWeight: "800"
+    fontWeight: "900"
   },
   roleRow: {
     flexDirection: "row",
@@ -595,9 +671,33 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
     backgroundColor: colors.accentSoft,
     color: colors.accent,
-    fontWeight: "800",
+    fontWeight: "900",
     lineHeight: 20,
     padding: 12
+  },
+  planStrip: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8
+  },
+  planMini: {
+    flex: 1,
+    minWidth: 95,
+    borderRadius: radius.sm,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.softBorder,
+    padding: 10
+  },
+  planName: {
+    color: colors.mutedDark,
+    fontWeight: "900",
+    fontSize: 12
+  },
+  planPrice: {
+    color: colors.text,
+    fontWeight: "900",
+    marginTop: 4
   },
   legalText: {
     color: colors.muted,
