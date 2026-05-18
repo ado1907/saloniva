@@ -5,12 +5,14 @@ import { AppointmentDetail } from "../components/AppointmentDetail";
 import { CompactRow } from "../components/CompactRow";
 import { ModalShell } from "../components/ModalShell";
 import { PanelCard } from "../components/PanelCard";
+import { SalonivaIntelligencePanel } from "../components/SalonivaIntelligencePanel";
 import { services, staff } from "../data/demoData";
 import { useSalonStore } from "../state/SalonStore";
 import { colors } from "../theme/colors";
 import { radius } from "../theme/spacing";
 import type { Appointment } from "../types";
 import { formatCurrency } from "../utils/format";
+import { buildSalonivaAiInsights, buildSalonivaSignals, getSalonivaDemoScore } from "../utils/salonivaAiInsights";
 
 type Props = {
   isWide: boolean;
@@ -24,6 +26,7 @@ export function DashboardScreen({ isWide }: Props) {
     bookingRequests,
     customers,
     inventoryItems,
+    payments,
     markAppointmentCompleted,
     packages,
     totals,
@@ -71,6 +74,47 @@ export function DashboardScreen({ isWide }: Props) {
     ],
     [debtCustomers.length, lowStock.length, pendingRequests.length, renewalPackages.length, totals.debt]
   );
+  const aiInsights = useMemo(
+    () =>
+      buildSalonivaAiInsights({
+        appointments,
+        bookingRequests,
+        customers,
+        inventoryItems,
+        packages,
+        payments,
+        totals
+      }),
+    [appointments, bookingRequests, customers, inventoryItems, packages, payments, totals]
+  );
+
+  const aiSignals = useMemo(
+    () =>
+      buildSalonivaSignals({
+        appointments,
+        bookingRequests,
+        customers,
+        inventoryItems,
+        packages,
+        payments,
+        totals
+      }),
+    [appointments, bookingRequests, customers, inventoryItems, packages, payments, totals]
+  );
+
+  const aiScore = useMemo(
+    () =>
+      getSalonivaDemoScore({
+        appointments,
+        bookingRequests,
+        customers,
+        inventoryItems,
+        packages,
+        payments,
+        totals
+      }),
+    [appointments, bookingRequests, customers, inventoryItems, packages, payments, totals]
+  );
 
   const vipCustomers = useMemo(
     () => [...customers].sort((first, second) => second.totalSpent - first.totalSpent).slice(0, 3),
@@ -113,6 +157,12 @@ export function DashboardScreen({ isWide }: Props) {
         </View>
       </View>
 
+      <SalonivaIntelligencePanel
+        insights={aiInsights}
+        isWide={isWide}
+        score={aiScore}
+        signals={aiSignals}
+      />
       <View style={[styles.metricsGrid, isWide ? styles.metricsGridWide : null]}>
         <MetricTile title="Günlük ciro" value={formatCurrency(totals.expectedRevenue)} detail="Planlı randevu potansiyeli" tone="gold" />
         <MetricTile title="Tahsilat sağlığı" value={`%${collectionRate}`} detail={`${formatCurrency(totals.debt)} açık bakiye`} tone="sage" />

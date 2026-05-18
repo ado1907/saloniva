@@ -152,3 +152,6 @@ Satis oncesi kalan kritik basliklar:
 - Abonelik/odeme sistemi
 - App Store / Google Play ekran goruntuleri ve final marka assetleri
 - Gercek cihazlarda mobil tasma ve form testi
+## ZIP Entegrasyon Özeti
+
+İndirilen `react-native-skia-main.zip`, `ui-main.zip` ve `ai-main.zip` paketleri doğrudan projeye kopyalanmadı; Expo uyumluluğunu korumak için Saloniva'ya özel, yerel ve güvenli bir demo katmanı olarak uyarlandı. Dashboard'da `Saloniva AI Demo` karar paneli, sinyal haritası ve satış odaklı aksiyon önerileri bulunur. Teknik gerekçe ve sonraki adımlar için `docs/zip-integration-notes.md` dosyasına bakın.
