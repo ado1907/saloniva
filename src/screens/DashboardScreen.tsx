@@ -11,6 +11,7 @@ import { useSalonStore } from "../state/SalonStore";
 import { colors } from "../theme/colors";
 import { radius } from "../theme/spacing";
 import type { Appointment } from "../types";
+import { appointmentPaymentId, createPaymentFromAppointment } from "../utils/appointmentPayment";
 import { formatCurrency } from "../utils/format";
 import { buildSalonivaAiInsights, buildSalonivaSignals, getSalonivaDemoScore } from "../utils/salonivaAiInsights";
 
@@ -27,10 +28,10 @@ export function DashboardScreen({ isWide }: Props) {
     customers,
     inventoryItems,
     payments,
+    addPayment,
     markAppointmentCompleted,
     packages,
-    totals,
-    updateAppointmentStatus
+    totals
   } = useSalonStore();
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
 
@@ -116,6 +117,14 @@ export function DashboardScreen({ isWide }: Props) {
     [appointments, bookingRequests, customers, inventoryItems, packages, payments, totals]
   );
 
+  const handleTakePayment = (appointment: Appointment) => {
+    if (!payments.some((payment) => payment.id === appointmentPaymentId(appointment))) {
+      addPayment(createPaymentFromAppointment(appointment));
+    }
+
+    markAppointmentCompleted(appointment.id);
+  };
+
   const vipCustomers = useMemo(
     () => [...customers].sort((first, second) => second.totalSpent - first.totalSpent).slice(0, 3),
     [customers]
@@ -180,9 +189,8 @@ export function DashboardScreen({ isWide }: Props) {
             <AppointmentCard
               key={appointment.id}
               appointment={appointment}
-              onComplete={markAppointmentCompleted}
-              onStatusChange={updateAppointmentStatus}
               onOpenDetails={setSelectedAppointment}
+              onTakePayment={handleTakePayment}
             />
           ))}
         </PanelCard>

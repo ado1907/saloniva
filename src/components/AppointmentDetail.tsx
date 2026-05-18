@@ -6,6 +6,7 @@ import { StatusBadge } from "./StatusBadge";
 import { useSalonStore } from "../state/SalonStore";
 import { colors } from "../theme/colors";
 import type { Appointment } from "../types";
+import { appointmentPaymentId, createPaymentFromAppointment } from "../utils/appointmentPayment";
 import { formatCurrency } from "../utils/format";
 import { sendAppointmentReminder } from "../utils/whatsapp";
 
@@ -15,12 +16,21 @@ type Props = {
 };
 
 export function AppointmentDetail({ appointment, onClose }: Props) {
-  const { customers, payments, markAppointmentCompleted, updateAppointmentStatus } = useSalonStore();
+  const { addPayment, customers, payments, markAppointmentCompleted, updateAppointmentStatus } = useSalonStore();
   const customer = customers.find((item) => item.name === appointment.customer);
   const customerPayments = payments.filter((item) => item.customer === appointment.customer);
   const latestPayment = customerPayments[0];
 
   const completeAppointment = () => {
+    markAppointmentCompleted(appointment.id);
+    onClose();
+  };
+
+  const takePayment = () => {
+    if (!payments.some((payment) => payment.id === appointmentPaymentId(appointment))) {
+      addPayment(createPaymentFromAppointment(appointment));
+    }
+
     markAppointmentCompleted(appointment.id);
     onClose();
   };
@@ -38,7 +48,8 @@ export function AppointmentDetail({ appointment, onClose }: Props) {
       </View>
 
       <View style={styles.actions}>
-        <ActionButton icon="checkmark-circle-outline" label="Tamamlandı Yap" primary onPress={completeAppointment} />
+        <ActionButton icon="cash-outline" label="Ödeme Al" primary onPress={takePayment} />
+        <ActionButton icon="checkmark-circle-outline" label="Tamamlandı Yap" onPress={completeAppointment} />
         <ActionButton icon="person-outline" label="Geldi" onPress={() => updateAppointmentStatus(appointment.id, "Geldi")} />
         <ActionButton icon="alert-circle-outline" label="Gelmedi" onPress={() => updateAppointmentStatus(appointment.id, "Gelmedi")} />
         <ActionButton icon="close-circle-outline" label="İptal" onPress={() => updateAppointmentStatus(appointment.id, "İptal")} />

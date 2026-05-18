@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "../theme/colors";
 import { radius } from "../theme/spacing";
-import type { Appointment, AppointmentStatus } from "../types";
+import type { Appointment } from "../types";
 import { formatCurrency } from "../utils/format";
 import { sendAppointmentReminder } from "../utils/whatsapp";
 import { MiniButton } from "./MiniButton";
@@ -9,12 +9,11 @@ import { StatusBadge } from "./StatusBadge";
 
 type Props = {
   appointment: Appointment;
-  onComplete?: (appointmentId: string) => void;
-  onStatusChange?: (appointmentId: string, status: AppointmentStatus) => void;
   onOpenDetails?: (appointment: Appointment) => void;
+  onTakePayment?: (appointment: Appointment) => void;
 };
 
-export function AppointmentCard({ appointment, onComplete, onOpenDetails, onStatusChange }: Props) {
+export function AppointmentCard({ appointment, onOpenDetails, onTakePayment }: Props) {
   return (
     <Pressable onPress={() => onOpenDetails?.(appointment)} style={styles.card}>
       <View style={styles.timeBlock}>
@@ -30,10 +29,9 @@ export function AppointmentCard({ appointment, onComplete, onOpenDetails, onStat
           {appointment.service} • {appointment.staff} • {formatCurrency(appointment.price)}
         </Text>
         <View style={styles.actions}>
-          <MiniButton icon="checkmark-circle-outline" label="Tamamla" onPress={() => onComplete?.(appointment.id)} />
-          <MiniButton icon="alert-circle-outline" label="Gelmedi" onPress={() => onStatusChange?.(appointment.id, "Gelmedi")} />
-          <MiniButton icon="logo-whatsapp" label="WhatsApp" onPress={() => sendAppointmentReminder(appointment)} />
-          <MiniButton icon="cash-outline" label="Ödeme" />
+          <MiniButton icon="cash-outline" label="Ödeme Al" onPress={() => onTakePayment?.(appointment)} />
+          <MiniButton icon="logo-whatsapp" label="Hatırlat" onPress={() => sendAppointmentReminder(appointment)} />
+          <MiniButton icon="document-text-outline" label="Detay" onPress={() => onOpenDetails?.(appointment)} />
         </View>
       </View>
     </Pressable>

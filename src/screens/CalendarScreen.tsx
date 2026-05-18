@@ -10,11 +10,12 @@ import { useSalonStore } from "../state/SalonStore";
 import { useState } from "react";
 import { TextInput } from "react-native";
 import type { Appointment } from "../types";
+import { appointmentPaymentId, createPaymentFromAppointment } from "../utils/appointmentPayment";
 import { colors } from "../theme/colors";
 import { radius } from "../theme/spacing";
 
 export function CalendarScreen() {
-  const { appointments, markAppointmentCompleted, updateAppointmentStatus } = useSalonStore();
+  const { addPayment, appointments, markAppointmentCompleted, payments } = useSalonStore();
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [activeStatus, setActiveStatus] = useState("Tümü");
   const [query, setQuery] = useState("");
@@ -23,6 +24,14 @@ export function CalendarScreen() {
       `${appointment.customer} ${appointment.service} ${appointment.staff}`.toLowerCase().includes(query.toLowerCase())
     )
     .filter((appointment) => (activeStatus === "Tümü" ? true : appointment.status === activeStatus));
+
+  const handleTakePayment = (appointment: Appointment) => {
+    if (!payments.some((payment) => payment.id === appointmentPaymentId(appointment))) {
+      addPayment(createPaymentFromAppointment(appointment));
+    }
+
+    markAppointmentCompleted(appointment.id);
+  };
 
   return (
     <View style={styles.sectionGap}>
@@ -53,10 +62,9 @@ export function CalendarScreen() {
           filteredAppointments.map((appointment) => (
             <AppointmentCard
               key={appointment.id}
-            appointment={appointment}
-            onComplete={markAppointmentCompleted}
-            onStatusChange={updateAppointmentStatus}
+              appointment={appointment}
             onOpenDetails={setSelectedAppointment}
+              onTakePayment={handleTakePayment}
           />
           ))
         ) : (
