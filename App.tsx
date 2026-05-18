@@ -40,7 +40,6 @@ import { AppPreferencesProvider, useAppPreferences } from "./src/state/AppPrefer
 import { SalonStoreProvider } from "./src/state/SalonStore";
 import { createDemoAuthSession, type AuthSession } from "./src/services/authGateway";
 import { colors } from "./src/theme/colors";
-import { typography } from "./src/theme/typography";
 import type { SalonAccount, TabKey } from "./src/types";
 
 type ActiveModal = "appointment" | "customer" | "payment" | null;
@@ -187,12 +186,19 @@ function Header({
 
   return (
     <View style={[styles.header, isDarkMode ? styles.headerDark : null]}>
-      <View>
-        <Text style={[styles.eyebrow, isDarkMode ? styles.eyebrowDark : null]}>{account.salonName}</Text>
+      <View style={styles.headerTitleBlock}>
+        <View style={[styles.eyebrowPill, isDarkMode ? styles.eyebrowPillDark : null]}>
+          <Text style={[styles.eyebrow, isDarkMode ? styles.eyebrowDark : null]}>{account.salonName}</Text>
+        </View>
         <Text style={[styles.title, isDarkMode ? styles.titleDark : null]}>{t("todayFlow")}</Text>
-        <Text style={[styles.subtitle, isDarkMode ? styles.subtitleDark : null]}>
-          9 Mayıs 2026 Cumartesi • {account.ownerName} • {account.role} • {isCloudSession ? "Bulut aktif" : "Demo local"}
-        </Text>
+        <View style={styles.metaRow}>
+          <Text style={[styles.subtitle, isDarkMode ? styles.subtitleDark : null]}>
+            9 Mayıs 2026 Cumartesi • {account.ownerName} • {account.role}
+          </Text>
+          <View style={[styles.statusChip, isCloudSession ? styles.statusChipCloud : styles.statusChipDemo]}>
+            <Text style={styles.statusChipText}>{isCloudSession ? "Bulut aktif" : "Demo local"}</Text>
+          </View>
+        </View>
       </View>
       <View style={styles.headerActions}>
         <ActionButton icon="search-outline" label={t("search")} onPress={onSearch} />
@@ -226,15 +232,16 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background
   },
   contentDark: {
-    backgroundColor: "#2b2a20"
+    backgroundColor: "#10140f"
   },
   scrollContent: {
-    padding: 20,
-    paddingBottom: 108
+    paddingHorizontal: 22,
+    paddingTop: 22,
+    paddingBottom: 132
   },
   header: {
-    gap: 16,
-    marginBottom: 22,
+    gap: 20,
+    marginBottom: 26,
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
@@ -243,19 +250,39 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.softBorder,
     backgroundColor: colors.card,
-    padding: 16,
+    paddingVertical: 22,
+    paddingHorizontal: 22,
     shadowColor: colors.shadow,
     shadowOpacity: 1,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 7 },
-    elevation: 2
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 14 },
+    elevation: 5
   },
   headerDark: {
-    borderRadius: 7,
-    borderWidth: 1,
-    borderColor: colors.sage,
+    borderColor: "rgba(244, 231, 206, 0.18)",
     backgroundColor: colors.ink,
-    padding: 14
+    shadowColor: "#000000",
+    shadowOpacity: 0.30,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 14 },
+    elevation: 7
+  },
+  headerTitleBlock: {
+    flexShrink: 1,
+    maxWidth: 720
+  },
+  eyebrowPill: {
+    alignSelf: "flex-start",
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.sageSoft,
+    backgroundColor: colors.accentSofter,
+    paddingHorizontal: 12,
+    paddingVertical: 7
+  },
+  eyebrowPillDark: {
+    borderColor: "rgba(244, 231, 206, 0.24)",
+    backgroundColor: "rgba(244, 231, 206, 0.10)"
   },
   eyebrow: {
     color: colors.accent,
@@ -268,24 +295,50 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.text,
-    fontSize: typography.title,
-    fontWeight: "800",
-    marginTop: 5
+    fontSize: 32,
+    lineHeight: 39,
+    fontWeight: "900",
+    marginTop: 12
   },
   titleDark: {
     color: colors.white
   },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 10,
+    marginTop: 8
+  },
   subtitle: {
     color: colors.muted,
     fontSize: 15,
-    marginTop: 4
+    lineHeight: 23
   },
   subtitleDark: {
     color: "#efe4cf"
   },
+  statusChip: {
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6
+  },
+  statusChipCloud: {
+    backgroundColor: colors.accentSoft
+  },
+  statusChipDemo: {
+    backgroundColor: colors.champagneSoft
+  },
+  statusChipText: {
+    color: colors.accent,
+    fontSize: 12,
+    fontWeight: "900"
+  },
   headerActions: {
     flexDirection: "row",
     gap: 10,
-    flexWrap: "wrap"
+    flexWrap: "wrap",
+    justifyContent: "flex-end",
+    maxWidth: 620
   }
 });
