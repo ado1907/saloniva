@@ -88,6 +88,7 @@ Sifre sifirlama icin Supabase > Authentication > URL Configuration alaninda:
 - [Gercek cihaz test listesi](./docs/store-assets/real-device-test-checklist.md)
 - [Abonelik/odeme uygulama plani](./docs/billing-implementation-plan.md)
 - [White-label satis paketi](./docs/white-label-sales-kit/README.md)
+- [Premium white-label paket ozeti](./docs/white-label-sales-kit/00-premium-package-overview.md)
 - [Fiyat teklif sablonu](./docs/white-label-sales-kit/03-price-quote-template.md)
 
 HTML satis dosyasi tarayicida acilip yazdirma ekranindan PDF olarak alinabilir.

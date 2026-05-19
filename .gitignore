@@ -32,4 +32,4 @@ Thumbs.db
 tmp/
 temp/
 *.tmp
-
+expo-web.*.log
