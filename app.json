@@ -2,7 +2,8 @@
   "expo": {
     "name": "Saloniva",
     "slug": "saloniva",
-    "version": "0.2.0",
+    "version": "1.0.0",
+    "description": "Premium salon and beauty reservation management SaaS for web, Android, and iOS.",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "scheme": "saloniva",
@@ -10,25 +11,32 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F7F0E6"
+      "backgroundColor": "#F7F1E8"
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.saloniva.app"
+      "bundleIdentifier": "com.saloniva.app",
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.saloniva.app",
+      "versionCode": 1,
       "permissions": [],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#F7F0E6"
+        "backgroundColor": "#F7F1E8"
       }
     },
     "web": {
-      "bundler": "metro"
+      "bundler": "metro",
+      "name": "Saloniva",
+      "shortName": "Saloniva"
     },
     "plugins": []
   }

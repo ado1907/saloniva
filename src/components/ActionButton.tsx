@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+﻿import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, type GestureResponderEvent } from "react-native";
 import { colors } from "../theme/colors";
 import { radius } from "../theme/spacing";
@@ -17,7 +17,11 @@ export function ActionButton({ icon, label, primary, onPress }: Props) {
   };
 
   return (
-    <Pressable onPress={handlePress} style={[styles.button, primary ? styles.primary : null]}>
+    <Pressable
+      accessibilityRole="button"
+      onPress={handlePress}
+      style={({ pressed }) => [styles.button, primary ? styles.primary : null, pressed ? styles.pressed : null]}
+    >
       <Ionicons name={icon} size={18} color={primary ? colors.white : colors.accent} />
       <Text style={[styles.text, primary ? styles.primaryText : null]}>{label}</Text>
     </Pressable>
@@ -26,9 +30,9 @@ export function ActionButton({ icon, label, primary, onPress }: Props) {
 
 const styles = StyleSheet.create({
   button: {
-    minHeight: 40,
+    minHeight: 42,
     borderRadius: radius.sm,
-    paddingHorizontal: 14,
+    paddingHorizontal: 15,
     borderWidth: 1,
     borderColor: colors.softBorder,
     backgroundColor: colors.card,
@@ -38,17 +42,21 @@ const styles = StyleSheet.create({
     gap: 8,
     shadowColor: colors.shadow,
     shadowOpacity: 1,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 1
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2
   },
   primary: {
-    borderColor: colors.sage,
+    borderColor: colors.accent,
     backgroundColor: colors.accent
+  },
+  pressed: {
+    transform: [{ translateY: 1 }],
+    opacity: 0.9
   },
   text: {
     color: colors.accent,
-    fontWeight: "800",
+    fontWeight: "900",
     fontSize: 13
   },
   primaryText: {

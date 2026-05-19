@@ -1,8 +1,8 @@
-# Saloniva
+﻿# Saloniva
 
 Saloniva, guzellik salonlari ve premium beauty merkezleri icin Web, Android ve iOS uyumlu salon yonetim uygulamasidir. Randevu, musteri, paket, seans, odeme, stok, personel, rapor ve satis firsatlarini tek bir profesyonel panelde toplar.
 
-Bu repo su anda **pazarlanabilir demo / pilot satis** seviyesindedir. Supabase auth ve salon bazli veri ayrimi kurulmustur; canli satis oncesi odeme aboneligi, sifre sifirlama, hesap silme linki, magaza ikon/splash ve gercek cihaz testleri tamamlanmalidir.
+Bu repo **satilabilir MVP / pilot satis** seviyesine hazirlanmistir. Supabase auth, salon bazli veri ayrimi, randevu/odeme/musteri akislari, premium plan ekrani ve store hazirlik dokumanlari bulunur. Canli satis oncesi gercek odeme saglayicisi, hukuki sayfalarin yayinlanmasi, store screenshotlari ve gercek cihaz testleri tamamlanmalidir.
 
 ## Hizli Baslangic
 
@@ -11,18 +11,30 @@ npm install
 npm run web
 ```
 
-Tarayicida:
+Tarayicida Expo'nun verdigi adresi acin. Varsayilan adres genellikle:
 
 ```text
 http://localhost:8081
 ```
 
-Android ve iOS icin:
+Android ve iOS gelistirme icin:
 
 ```bash
 npm run android
 npm run ios
 ```
+
+## Build Komutlari
+
+```bash
+npm run typecheck
+npm run build:android:apk
+npm run build:android:aab
+npm run build:ios
+npm run build:ios:simulator
+```
+
+Ayrintili kurulum ve build notlari icin [BUILD_GUIDE.md](./BUILD_GUIDE.md) dosyasina bakin.
 
 ## Demo Giris
 
@@ -40,9 +52,9 @@ Supabase modda yeni salon hesabi olusturulduktan sonra `Ayarlar > Demo Veriye Si
 1. Supabase projesi olustur.
 2. `supabase/schema.sql` dosyasini SQL Editor icinde calistir.
 3. `supabase/phase2-auth.sql` dosyasini SQL Editor icinde calistir.
-4. Authentication > Sign In / Providers > Email etkin olsun.
+4. Authentication > Sign In / Providers > Email aktif olsun.
 5. Test icin gerekirse Confirm email kapatilabilir; canli kullanimda e-posta dogrulama acik kalmalidir.
-6. `.env` dosyasina asagidaki alanlari ekle:
+6. `.env` dosyasini `.env.example` uzerinden doldur.
 
 ```env
 EXPO_PUBLIC_BACKEND_MODE=supabase
@@ -52,7 +64,7 @@ EXPO_PUBLIC_DEMO_SALON_ID=demo-saloniva
 EXPO_PUBLIC_AUTH_REDIRECT_URL=https://saloniva.app/auth/callback
 ```
 
-Gizli `service_role` anahtari uygulamaya, GitHub'a veya README'ye konulmaz.
+Gizli `service_role` veya `sb_secret` anahtari uygulamaya, GitHub'a veya README'ye konulmaz.
 
 Sifre sifirlama icin Supabase > Authentication > URL Configuration alaninda:
 
@@ -73,6 +85,21 @@ Sifre sifirlama icin Supabase > Authentication > URL Configuration alaninda:
 - Dil secenekleri, koyu mod ve App Store uyumlu ayar ekranlari
 - Supabase auth, RLS ve salon bazli veri ayrimi
 
+## Premium Planlar
+
+- Free: 0 TL - temel randevu, musteri ve gelir ozeti
+- Pro: 299 TL / ay - paket, seans, odeme, personel ve online talep akislari
+- Business: 699 TL / ay - cok sube, gelismis raporlar, oncelikli destek ve white-label teslim senaryosu
+
+## Store ve Release Dosyalari
+
+- [STORE_LISTING_TR.md](./STORE_LISTING_TR.md)
+- [STORE_LISTING_EN.md](./STORE_LISTING_EN.md)
+- [PRIVACY_POLICY_DRAFT.md](./PRIVACY_POLICY_DRAFT.md)
+- [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md)
+- [BUILD_GUIDE.md](./BUILD_GUIDE.md)
+- [CODEX_CHANGELOG.md](./CODEX_CHANGELOG.md)
+
 ## Satis Materyalleri
 
 - [1 dakikalik demo ekran akisi](./docs/sales-assets/demo-video-screen-flow.md)
@@ -80,7 +107,6 @@ Sifre sifirlama icin Supabase > Authentication > URL Configuration alaninda:
 - [E-posta ve WhatsApp satis metinleri](./docs/sales-assets/outreach-templates.md)
 - [Gorsel HTML/PDF satis dosyasi](./docs/sales-assets/saloniva-one-pager.html)
 - [Uretim eksigi listesi](./docs/sales-assets/production-gap-list.md)
-- [Uretim ilerleme notu](./docs/sales-assets/production-progress-2026-05-12.md)
 - [Hukuki sayfa hazirligi](./docs/legal-pages.md)
 - [Yayina hazir statik web sayfalari](./docs/public-site/README.md)
 - [Mobil QA kontrol listesi](./docs/mobile-qa-checklist.md)
@@ -95,7 +121,7 @@ HTML satis dosyasi tarayicida acilip yazdirma ekranindan PDF olarak alinabilir.
 
 ## White-Label Teslim Modeli
 
-Alıcıya verilecek paket:
+Aliciya verilecek paket:
 
 - Saloniva markali veya alici markasina uyarlanmis uygulama arayuzu
 - Web demo kurulumu ve Expo tabanli Android/iOS proje yapisi
@@ -131,7 +157,7 @@ docs/
   white-label-sales-kit/
 ```
 
-## Kontrol Listesi
+## Release Durumu
 
 Tamamlananlar:
 
@@ -143,16 +169,13 @@ Tamamlananlar:
 - Iki farkli salon icin veri ayrimi/RLS testi gecti.
 - Sifre sifirlama e-postasi istemci akisi eklendi.
 - App Store / Google Play icin temel icon, adaptive icon ve splash varliklari eklendi.
-- GitHub push akisi tamamlandi.
+- GitHub push akisi daha once tamamlandi.
 
 Satis oncesi kalan kritik basliklar:
 
 - Supabase sifre sifirlama redirect URL ve e-posta sablonu canli domain ile ayarlanacak.
 - Hesap silme web linki gercek yayina alinacak.
 - Gizlilik politikasi ve destek sayfasi gercek web sitesinde yayinlanacak.
-- Abonelik/odeme sistemi
-- App Store / Google Play ekran goruntuleri ve final marka assetleri
-- Gercek cihazlarda mobil tasma ve form testi
-## ZIP Entegrasyon Özeti
-
-İndirilen `react-native-skia-main.zip`, `ui-main.zip` ve `ai-main.zip` paketleri doğrudan projeye kopyalanmadı; Expo uyumluluğunu korumak için Saloniva'ya özel, yerel ve güvenli bir demo katmanı olarak uyarlandı. Dashboard'da `Saloniva AI Demo` karar paneli, sinyal haritası ve satış odaklı aksiyon önerileri bulunur. Teknik gerekçe ve sonraki adımlar için `docs/zip-integration-notes.md` dosyasına bakın.
+- Abonelik/odeme sistemi gercek saglayiciya baglanacak.
+- App Store / Google Play ekran goruntuleri ve final marka assetleri hazirlanacak.
+- Gercek cihazlarda mobil tasma ve form testi yapilacak.

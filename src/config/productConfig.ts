@@ -1,6 +1,6 @@
 export const productConfig = {
   appName: "Saloniva",
-  legalName: "Saloniva Yazılım",
+  legalName: "Saloniva Software",
   supportEmail: "destek@saloniva.app",
   websiteUrl: "https://saloniva.app",
   privacyUrl: "https://saloniva.app/gizlilik",
@@ -15,31 +15,34 @@ export const productConfig = {
   plans: [
     {
       id: "starter",
-      name: "Başlangıç",
-      price: "399 TL/ay",
-      description: "Tek şube, temel randevu ve müşteri takibi.",
-      limits: "1 kullanıcı, 1 şube, temel rapor"
+      name: "Free",
+      price: "0 TL",
+      description: "Demo ve tek kullanicili baslangic salon takibi.",
+      limits: "1 kullanici, temel randevu, demo raporlar",
+      features: ["Randevu takvimi", "Musteri listesi", "Temel gelir ozeti"]
     },
     {
       id: "pro",
-      name: "Profesyonel",
-      price: "799 TL/ay",
-      description: "Paket, ödeme, personel, rapor ve kampanya modülleri.",
-      limits: "5 kullanıcı, gelişmiş rapor, WhatsApp akışları"
+      name: "Pro",
+      price: "299 TL / ay",
+      description: "Paket, odeme, personel ve gunluk karar paneliyle aktif salon yonetimi.",
+      limits: "5 kullanici, profesyonel rapor, paket ve tahsilat takibi",
+      features: ["Paket ve seans takibi", "Odeme hatirlatmalari", "Personel performansi", "Online talep yonetimi"]
     },
     {
       id: "premium",
-      name: "Premium",
-      price: "1.299 TL/ay",
-      description: "Çok şube, gelişmiş rapor, öncelikli destek ve müşteri uygulaması.",
-      limits: "Çok şube, müşteri uygulaması, öncelikli destek"
+      name: "Business",
+      price: "699 TL / ay",
+      description: "Cok subeli markalar ve premium salonlar icin buyume paketi.",
+      limits: "Cok sube, gelismis rapor, oncelikli destek, musteri uygulamasi hazirligi",
+      features: ["Cok sube yonetimi", "Gelismis gelir raporlari", "Oncelikli destek", "White-label teslim hazirligi"]
     }
   ],
   demoAccount: {
     salonId: "salon-demo-001",
     planId: "pro",
     subscriptionStatus: "Deneme",
-    trialEndsAt: "23 Mayıs 2026",
+    trialEndsAt: "23 Mayis 2026",
     permissions: ["randevu", "musteri", "odeme", "rapor", "ayar", "personel"]
   }
 } as const;
