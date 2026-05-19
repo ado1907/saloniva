@@ -38,6 +38,8 @@
       "name": "Saloniva",
       "shortName": "Saloniva"
     },
-    "plugins": []
+    "plugins": [
+      "expo-font"
+    ]
   }
 }
