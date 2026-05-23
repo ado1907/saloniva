@@ -20,6 +20,7 @@ export type RegisterSalonPayload = {
 export type AuthSession = {
   accessToken: string;
   refreshToken: string;
+  expiresAt?: number;
   account: SalonAccount;
 };
 

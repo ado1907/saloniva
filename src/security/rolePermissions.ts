@@ -24,7 +24,7 @@ export type RolePermissionProfile = {
 export type DataSecurityItem = {
   title: string;
   description: string;
-  sensitivity: "Yüksek" | "Orta" | "Düşük";
+  sensitivity: "Yüksek" | "Orta" | "eüşük";
   productionRule: string;
 };
 
@@ -94,11 +94,11 @@ export const sensitiveDataCatalog: DataSecurityItem[] = [
 ];
 
 export const securityReadinessChecklist = [
-  "Her API isteğinde salonId sunucuda doğrulanmalı.",
+  "Her APn isteğinde salonnd sunucuda doğrulanmalı.",
   "Rol yetkileri sadece uygulama içinde değil backend tarafında da kontrol edilmeli.",
   "Hesap silme ve veri dışa aktarma işlemleri kayıt altına alınmalı.",
   "Müşteri notları ve ödeme verileri hassas veri olarak sınıflandırılmalı.",
-  "Demo hesap gerçek müşteri verisi taşımamalı."
+  "Inceleme hesabi gercek musteri verisi tasimamali."
 ];
 
 export function getRoleProfile(role: UserRole) {

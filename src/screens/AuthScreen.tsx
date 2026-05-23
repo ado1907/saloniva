@@ -3,6 +3,7 @@ import { ImageBackground, Pressable, ScrollView, StyleSheet, Text, TextInput, Vi
 import { ActionButton } from "../components/ActionButton";
 import { BrandMark } from "../components/BrandMark";
 import { Pill } from "../components/Pill";
+import { MarketingSections } from "../components/MarketingSections";
 import { productConfig } from "../config/productConfig";
 import { visualAssets } from "../config/visualAssets";
 import { createRegisteredSalonSession, type AuthSession } from "../services/authGateway";
@@ -34,17 +35,30 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
   const { width } = useWindowDimensions();
   const isNarrow = width < 900;
   const isCompact = width < 430;
+  const isDemoLocal = supabaseConfig.backendMode === "demo-local";
   const [mode, setMode] = useState<AuthMode>("login");
   const [view, setView] = useState<AuthView>("marketing");
-  const [salonName, setSalonName] = useState("Saloniva Güzellik");
-  const [ownerName, setOwnerName] = useState("Demo Kullanıcı");
-  const [email, setEmail] = useState("demo@saloniva.app");
-  const [password, setPassword] = useState("demo1234");
+  const [salonName, setSalonName] = useState(isDemoLocal ? "Saloniva Güzellik" : "");
+  const [ownerName, setOwnerName] = useState(isDemoLocal ? "Demo Kullanıcı" : "");
+  const [email, setEmail] = useState(isDemoLocal ? "demo@saloniva.app" : "");
+  const [password, setPassword] = useState(isDemoLocal ? "demo1234" : "");
   const [role, setRole] = useState<UserRole>("Salon Sahibi");
   const [authStatus, setAuthStatus] = useState<string | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
 
+  const openDemoOrExplain = () => {
+    if (isDemoLocal) {
+      onDemoLogin();
+      return;
+    }
+
+    setView("auth");
+    setMode("create");
+    setAuthStatus("Canlı kullanım için salon hesabı oluşturun. Satış ön izlemesi gerekiyorsa ayrı bir inceleme hesabı hazırlayın.");
+  };
   const runAuthAction = async (action: () => Promise<AuthSession>, successMessage: string) => {
+    if (isAuthLoading) { return; }
+
     setIsAuthLoading(true);
     setAuthStatus("Supabase ile güvenli bağlantı kuruluyor...");
 
@@ -61,10 +75,17 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
   };
 
   const loginWithCloud = () => {
+    if (!supabaseConfig.configured) {
+      setAuthStatus("Supabase bağlantısı hazır değil. .env içindeki URL ve publishable anon key değerlerini kontrol edin.");
+      return;
+    }
+
     void runAuthAction(async () => signInWithSupabase(email, password), "Giriş başarılı.");
   };
 
   const requestPasswordReset = async () => {
+    if (isAuthLoading) { return; }
+
     const trimmedEmail = email.trim();
 
     if (!trimmedEmail) {
@@ -73,7 +94,7 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
     }
 
     if (!supabaseConfig.configured) {
-      setAuthStatus("Şifre sıfırlama canlı Supabase bağlantısı açıldığında e-posta ile gönderilir.");
+      setAuthStatus("Şifre sıfırlama için Supabase URL ve publishable anon key hazır olmalı.");
       return;
     }
 
@@ -102,10 +123,14 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
     };
 
     if (!supabaseConfig.configured) {
-      onCreateSalon(createRegisteredSalonSession(fallbackPayload));
+      if (isDemoLocal) {
+        onCreateSalon(createRegisteredSalonSession(fallbackPayload));
+        return;
+      }
+
+      setAuthStatus("Production modunda Supabase bağlantısı zorunlu. .env dosyasındaki URL ve publishable anon key değerlerini kontrol edin.");
       return;
     }
-
     void runAuthAction(async () => registerSalonWithSupabase(fallbackPayload), "Salon hesabı oluşturuldu.");
   };
 
@@ -121,15 +146,15 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
             </View>
           </View>
           <View style={styles.navActions}>
-            <NavButton label="Demo" active={view === "marketing"} onPress={() => setView("marketing")} />
+            <NavButton label="Tanıtım" active={view === "marketing"} onPress={() => setView("marketing")} />
             <NavButton label="Giriş" active={view === "auth"} onPress={() => setView("auth")} />
           </View>
         </View>
 
         <View style={[styles.mainGrid, isNarrow ? styles.mainGridNarrow : null]}>
-          <HeroPanel isCompact={isCompact} onDemoLogin={onDemoLogin} onStart={() => setView("auth")} />
+          <HeroPanel isCompact={isCompact} onDemoLogin={openDemoOrExplain} onStart={() => setView("auth")} />
           {view === "marketing" ? (
-            <DemoPanel onDemoLogin={onDemoLogin} onStart={() => setView("auth")} />
+            <MarketingSections onProductTour={openDemoOrExplain} onStart={() => setView("auth")} />
           ) : (
             <AuthCard
               mode={mode}
@@ -144,7 +169,7 @@ export function AuthScreen({ onDemoLogin, onCreateSalon }: Props) {
               setPassword={setPassword}
               role={role}
               setRole={setRole}
-              onDemoLogin={onDemoLogin}
+              onDemoLogin={openDemoOrExplain}
               loginWithCloud={loginWithCloud}
               requestPasswordReset={requestPasswordReset}
               createSalon={createSalon}
@@ -183,7 +208,7 @@ function HeroPanel({ isCompact, onDemoLogin, onStart }: { isCompact: boolean; on
             Randevu, müşteri hafızası, paket yenileme ve tahsilat riskini tek bakışta gösteren premium güzellik salonu paneli.
           </Text>
           <View style={styles.heroActions}>
-            <ActionButton icon="play-circle-outline" label="Demo Hesabı Aç" primary onPress={onDemoLogin} />
+            <ActionButton icon="play-circle-outline" label="Ürün Turunu İncele" primary onPress={onDemoLogin} />
             <ActionButton icon="business-outline" label="Salon Hesabı" onPress={onStart} />
           </View>
         </View>
@@ -206,10 +231,10 @@ function DemoPanel({ onDemoLogin, onStart }: { onDemoLogin: () => void; onStart:
   return (
     <View style={styles.sidePanel}>
       <View style={styles.sideHeader}>
-        <Text style={styles.sideKicker}>Canlı demo akışı</Text>
-        <Text style={styles.sideTitle}>Boş ekran değil, dolu salon operasyonu.</Text>
+        <Text style={styles.sideKicker}>Canlı operasyon akışı</Text>
+        <Text style={styles.sideTitle}>Salon yönetimi tek ekranda netleşir.</Text>
         <Text style={styles.sideText}>
-          Demo hesabında VIP müşteri, açık tahsilat, online talep, paket yenileme ve stok riski hazır gelir.
+          VIP müşteri, açık tahsilat, online talep, paket yenileme ve stok riski tek akışta görünür.
         </Text>
       </View>
 
@@ -223,14 +248,14 @@ function DemoPanel({ onDemoLogin, onStart }: { onDemoLogin: () => void; onStart:
       </View>
 
       <View style={styles.readinessPanel}>
-        <Text style={styles.readinessTitle}>Satış vaadi</Text>
+        <Text style={styles.readinessTitle}>Ürün vaadi</Text>
         <Text style={styles.readinessText}>
           “Salonunuzda hangi müşteri ödeme bekliyor, hangi paket bitiyor, hangi randevu riske giriyor?” sorusunu tek ekranda cevaplar.
         </Text>
       </View>
 
       <View style={styles.sideActions}>
-        <ActionButton icon="play-circle-outline" label="Demo İncele" primary onPress={onDemoLogin} />
+        <ActionButton icon="play-circle-outline" label="Ürün Turunu İncele" primary onPress={onDemoLogin} />
         <ActionButton icon="arrow-forward-outline" label="Girişe Geç" onPress={onStart} />
       </View>
     </View>
@@ -293,13 +318,13 @@ function AuthCard({
           <Text style={styles.formNote}>Bulut verileriniz ve salon paneliniz güvenli oturumla açılır.</Text>
           <TextInput value={email} onChangeText={setEmail} placeholder="E-posta" keyboardType="email-address" autoCapitalize="none" style={styles.input} />
           <TextInput value={password} onChangeText={setPassword} placeholder="Şifre" secureTextEntry style={styles.input} />
-          <ActionButton icon="log-in-outline" label={isAuthLoading ? "Bağlanıyor" : "Giriş Yap"} primary onPress={loginWithCloud} />
+          <ActionButton icon="log-in-outline" label={isAuthLoading ? "Bağlanıyor" : "Giriş Yap"} primary onPress={isAuthLoading ? undefined : loginWithCloud} />
           <View style={styles.authLinks}>
-            <Pressable onPress={requestPasswordReset} style={styles.linkButton}>
+            <Pressable disabled={isAuthLoading} onPress={requestPasswordReset} style={styles.linkButton}>
               <Text style={styles.linkText}>Şifremi unuttum</Text>
             </Pressable>
             <Pressable onPress={onDemoLogin} style={styles.linkButton}>
-              <Text style={styles.linkTextAccent}>Demo hesapla incele</Text>
+              <Text style={styles.linkTextAccent}>Ürün turunu incele</Text>
             </Pressable>
           </View>
         </View>
@@ -316,7 +341,7 @@ function AuthCard({
               <Pill key={item} label={item} active={role === item} onPress={() => setRole(item)} />
             ))}
           </View>
-          <ActionButton icon="business-outline" label={isAuthLoading ? "Oluşturuluyor" : "Salonu Oluştur"} primary onPress={createSalon} />
+          <ActionButton icon="business-outline" label={isAuthLoading ? "Oluşturuluyor" : "Salonu Oluştur"} primary onPress={isAuthLoading ? undefined : createSalon} />
         </View>
       )}
 

@@ -1,5 +1,16 @@
 import { supabaseConfig } from "./supabaseConfig";
 
+export class SupabaseUnauthorizedError extends Error {
+  constructor(message = "Oturum süresi doldu. Lütfen tekrar giriş yapın.") {
+    super(message);
+    this.name = "SupabaseUnauthorizedError";
+  }
+}
+
+export function isSupabaseUnauthorizedError(error: unknown) {
+  return error instanceof SupabaseUnauthorizedError;
+}
+
 type JsonRecord = Record<string, unknown>;
 
 export type SupabaseQueryOptions = {

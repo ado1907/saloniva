@@ -201,8 +201,8 @@ create policy "owners can manage salon membership" on public.salon_members
 create policy "members can read customers" on public.customers
   for select using (public.is_salon_member(salon_id));
 create policy "staff can write customers" on public.customers
-  for all using (public.has_salon_role(salon_id, array['Salon Sahibi','Yönetici','Personel']))
-  with check (public.has_salon_role(salon_id, array['Salon Sahibi','Yönetici','Personel']));
+  for all using (public.has_salon_role(salon_id, array['Salon Sahibi','Yönetici']))
+  with check (public.has_salon_role(salon_id, array['Salon Sahibi','Yönetici']));
 
 create policy "members can read appointments" on public.appointments
   for select using (public.is_salon_member(salon_id));
@@ -213,8 +213,8 @@ create policy "staff can write appointments" on public.appointments
 create policy "members can read packages" on public.service_packages
   for select using (public.is_salon_member(salon_id));
 create policy "staff can write packages" on public.service_packages
-  for all using (public.has_salon_role(salon_id, array['Salon Sahibi','Yönetici','Personel']))
-  with check (public.has_salon_role(salon_id, array['Salon Sahibi','Yönetici','Personel']));
+  for all using (public.has_salon_role(salon_id, array['Salon Sahibi','Yönetici']))
+  with check (public.has_salon_role(salon_id, array['Salon Sahibi','Yönetici']));
 
 create policy "managers can read payments" on public.payments
   for select using (public.has_salon_role(salon_id, array['Salon Sahibi','Yönetici']));
@@ -308,7 +308,7 @@ begin
   values (
     new_salon_id,
     auth.uid(),
-    case when role_input in ('Salon Sahibi', 'Yönetici', 'Personel') then role_input else 'Salon Sahibi' end
+    'Salon Sahibi'
   );
 
   insert into public.audit_logs (salon_id, actor_user_id, action, table_name, record_id, metadata)
@@ -371,3 +371,35 @@ $$;
 
 grant execute on function public.register_salon_account(text, text, text, text) to authenticated;
 grant execute on function public.get_my_salon_account() to authenticated;
+
+create or replace function public.get_my_salon_accounts()
+returns table (
+  salon_id uuid,
+  salon_name text,
+  owner_name text,
+  email text,
+  role text,
+  plan_id text,
+  subscription_status text,
+  trial_ends_at text
+)
+language sql
+security definer
+set search_path = public
+as $$
+  select
+    salons.id,
+    salons.name,
+    salons.owner_name,
+    coalesce(auth.jwt() ->> 'email', ''),
+    salon_members.role,
+    salons.plan_id,
+    salons.subscription_status,
+    to_char(salons.trial_ends_at, 'DD.MM.YYYY')
+  from public.salons
+  join public.salon_members on salon_members.salon_id = salons.id
+  where salon_members.user_id = auth.uid()
+  order by salon_members.created_at asc;
+$$;
+
+grant execute on function public.get_my_salon_accounts() to authenticated;

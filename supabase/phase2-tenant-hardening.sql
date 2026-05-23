@@ -1,13 +1,6 @@
--- Saloniva phase 2: real auth + salon account bootstrap
--- Run this after supabase/schema.sql.
-
-create or replace function public.slugify_salon_name(input text)
-returns text
-language sql
-immutable
-as $$
-  select trim(both '-' from regexp_replace(lower(coalesce(input, 'salon')), '[^a-z0-9]+', '-', 'g'));
-$$;
+-- Saloniva phase 2 tenant hardening
+-- Run after supabase/schema.sql and supabase/phase2-auth.sql.
+-- Safe to run more than once.
 
 create or replace function public.register_salon_account(
   salon_name_input text,
@@ -55,11 +48,7 @@ begin
   returning id into new_salon_id;
 
   insert into public.salon_members (salon_id, user_id, role)
-  values (
-    new_salon_id,
-    auth.uid(),
-    'Salon Sahibi'
-  );
+  values (new_salon_id, auth.uid(), 'Salon Sahibi');
 
   insert into public.audit_logs (salon_id, actor_user_id, action, table_name, record_id, metadata)
   values (
@@ -68,7 +57,7 @@ begin
     'salon_registered',
     'salons',
     new_salon_id::text,
-    jsonb_build_object('source', 'supabase_auth')
+    jsonb_build_object('source', 'supabase_auth', 'forced_owner_role', true)
   );
 
   return query
@@ -87,40 +76,6 @@ begin
     and salon_members.user_id = auth.uid();
 end;
 $$;
-
-create or replace function public.get_my_salon_account()
-returns table (
-  salon_id uuid,
-  salon_name text,
-  owner_name text,
-  email text,
-  role text,
-  plan_id text,
-  subscription_status text,
-  trial_ends_at text
-)
-language sql
-security definer
-set search_path = public
-as $$
-  select
-    salons.id,
-    salons.name,
-    salons.owner_name,
-    coalesce(auth.jwt() ->> 'email', ''),
-    salon_members.role,
-    salons.plan_id,
-    salons.subscription_status,
-    to_char(salons.trial_ends_at, 'DD.MM.YYYY')
-  from public.salons
-  join public.salon_members on salon_members.salon_id = salons.id
-  where salon_members.user_id = auth.uid()
-  order by salon_members.created_at asc
-  limit 1;
-$$;
-
-grant execute on function public.register_salon_account(text, text, text, text) to authenticated;
-grant execute on function public.get_my_salon_account() to authenticated;
 
 create or replace function public.get_my_salon_accounts()
 returns table (
@@ -152,4 +107,25 @@ as $$
   order by salon_members.created_at asc;
 $$;
 
+grant execute on function public.register_salon_account(text, text, text, text) to authenticated;
 grant execute on function public.get_my_salon_accounts() to authenticated;
+
+drop policy if exists "staff can write customers" on public.customers;
+create policy "staff can write customers" on public.customers
+  for all using (public.has_salon_role(salon_id, array['Salon Sahibi','Yönetici']))
+  with check (public.has_salon_role(salon_id, array['Salon Sahibi','Yönetici']));
+
+drop policy if exists "staff can write packages" on public.service_packages;
+create policy "staff can write packages" on public.service_packages
+  for all using (public.has_salon_role(salon_id, array['Salon Sahibi','Yönetici']))
+  with check (public.has_salon_role(salon_id, array['Salon Sahibi','Yönetici']));
+
+drop policy if exists "staff can write appointments" on public.appointments;
+create policy "staff can write appointments" on public.appointments
+  for all using (public.has_salon_role(salon_id, array['Salon Sahibi','Yönetici','Personel']))
+  with check (public.has_salon_role(salon_id, array['Salon Sahibi','Yönetici','Personel']));
+
+drop policy if exists "staff can manage booking requests" on public.booking_requests;
+create policy "staff can manage booking requests" on public.booking_requests
+  for all using (public.has_salon_role(salon_id, array['Salon Sahibi','Yönetici','Personel']))
+  with check (public.has_salon_role(salon_id, array['Salon Sahibi','Yönetici','Personel']));

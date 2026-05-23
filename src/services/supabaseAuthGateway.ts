@@ -12,6 +12,8 @@ type SupabaseAuthUser = {
 type SupabaseAuthResponse = {
   access_token?: string;
   refresh_token?: string;
+  expires_in?: number;
+  expires_at?: number;
   user?: SupabaseAuthUser;
 };
 
@@ -29,6 +31,7 @@ type CloudAccountRow = {
 export type SupabaseSalonSession = {
   accessToken: string;
   refreshToken: string;
+  expiresAt?: number;
   account: SalonAccount;
 };
 
@@ -62,10 +65,23 @@ async function parseAuthResponse(response: Response): Promise<SupabaseAuthRespon
   return payload as SupabaseAuthResponse;
 }
 
-function mapCloudAccount(row: CloudAccountRow, accessToken: string, refreshToken: string): SupabaseSalonSession {
+function getSessionExpiresAt(payload: SupabaseAuthResponse) {
+  if (typeof payload.expires_at === "number") {
+    return payload.expires_at * 1000;
+  }
+
+  if (typeof payload.expires_in === "number") {
+    return Date.now() + payload.expires_in * 1000;
+  }
+
+  return Date.now() + 1000 * 60 * 60;
+}
+
+function mapCloudAccount(row: CloudAccountRow, accessToken: string, refreshToken: string, expiresAt: number): SupabaseSalonSession {
   return {
     accessToken,
     refreshToken,
+    expiresAt,
     account: {
       salonId: row.salon_id,
       salonName: row.salon_name,
@@ -80,7 +96,7 @@ function mapCloudAccount(row: CloudAccountRow, accessToken: string, refreshToken
   };
 }
 
-async function fetchMySalonAccount(accessToken: string, refreshToken: string) {
+async function fetchMySalonAccount(accessToken: string, refreshToken: string, expiresAt: number) {
   const rows = await supabaseRestClient.rpc<CloudAccountRow[]>("get_my_salon_account", {}, { accessToken });
   const account = rows[0];
 
@@ -88,7 +104,12 @@ async function fetchMySalonAccount(accessToken: string, refreshToken: string) {
     throw new Error("Bu kullanıcıya bağlı salon hesabı bulunamadı.");
   }
 
-  return mapCloudAccount(account, accessToken, refreshToken);
+  return mapCloudAccount(account, accessToken, refreshToken, expiresAt);
+}
+export async function buildSupabaseSessionFromTokens(accessToken: string, refreshToken: string, expiresAt = Date.now() + 1000 * 60 * 60) {
+  assertAuthConfigured();
+
+  return fetchMySalonAccount(accessToken, refreshToken, expiresAt);
 }
 
 export async function signInWithSupabase(email: string, password: string) {
@@ -105,9 +126,25 @@ export async function signInWithSupabase(email: string, password: string) {
     throw new Error("Oturum başlatılamadı. E-posta doğrulaması açıksa önce doğrulama gerekebilir.");
   }
 
-  return fetchMySalonAccount(payload.access_token, payload.refresh_token);
+  return fetchMySalonAccount(payload.access_token, payload.refresh_token, getSessionExpiresAt(payload));
 }
 
+export async function refreshSupabaseSession(refreshToken: string) {
+  assertAuthConfigured();
+
+  const response = await fetch(`${supabaseConfig.url}/auth/v1/token?grant_type=refresh_token`, {
+    method: "POST",
+    headers: buildAuthHeaders(),
+    body: JSON.stringify({ refresh_token: refreshToken })
+  });
+  const payload = await parseAuthResponse(response);
+
+  if (!payload.access_token || !payload.refresh_token) {
+    throw new Error("Oturum yenilenemedi. Lütfen tekrar giriş yapın.");
+  }
+
+  return fetchMySalonAccount(payload.access_token, payload.refresh_token, getSessionExpiresAt(payload));
+}
 export async function registerSalonWithSupabase(payload: RegisterSalonPayload) {
   assertAuthConfigured();
 
@@ -146,7 +183,7 @@ export async function registerSalonWithSupabase(payload: RegisterSalonPayload) {
     throw new Error("Salon hesabı oluşturulamadı.");
   }
 
-  return mapCloudAccount(account, authPayload.access_token, authPayload.refresh_token);
+  return mapCloudAccount(account, authPayload.access_token, authPayload.refresh_token, getSessionExpiresAt(authPayload));
 }
 
 export async function requestPasswordResetWithSupabase(email: string) {
@@ -161,6 +198,21 @@ export async function requestPasswordResetWithSupabase(email: string) {
   await parseAuthResponse(response);
 }
 
+
+export async function updateSupabasePassword(accessToken: string, password: string) {
+  assertAuthConfigured();
+
+  const response = await fetch(`${supabaseConfig.url}/auth/v1/user`, {
+    method: "PUT",
+    headers: {
+      ...buildAuthHeaders(),
+      Authorization: `Bearer ${accessToken}`
+    },
+    body: JSON.stringify({ password })
+  });
+
+  await parseAuthResponse(response);
+}
 export const supabaseAuthReadiness = [
   "Supabase Email Auth aktif olmalı.",
   "Test aşamasında Email Confirm kapalı olursa kayıt sonrası direkt giriş yapılır.",
