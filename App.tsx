@@ -395,7 +395,14 @@ function SalonivaApp() {
               {activeTab === "clientApp" ? <ClientAppScreen /> : null}
               {activeTab === "quality" ? <QualityCenterScreen /> : null}
               {activeTab === "launch" ? <LaunchReadinessScreen /> : null}
-              {activeTab === "billing" ? <BillingScreen /> : null}
+              {activeTab === "billing" ? (
+                <BillingScreen
+                  account={account}
+                  accessToken={session?.accessToken}
+                  isCloudSession={isCloudSession}
+                  onNavigate={navigateToTab}
+                />
+              ) : null}
               {activeTab === "showcase" ? <ServiceShowcaseScreen /> : null}
               {activeTab === "opportunities" ? <SalesOpportunitiesScreen /> : null}
               {activeTab === "onboarding" ? <OnboardingScreen account={account} /> : null}
