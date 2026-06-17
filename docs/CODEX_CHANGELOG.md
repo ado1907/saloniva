@@ -1,4 +1,4 @@
-﻿# Codex Changelog
+# Codex Changelog
 
 ## 2026-05-20 - Store-ready MVP polish
 

@@ -34,7 +34,7 @@ npm run build:ios
 npm run build:ios:simulator
 ```
 
-Ayrintili kurulum ve build notlari icin [BUILD_GUIDE.md](./BUILD_GUIDE.md) dosyasina bakin.
+Ayrintili kurulum ve build notlari icin [docs/BUILD_GUIDE.md](./docs/BUILD_GUIDE.md) dosyasina bakin.
 
 ## Demo Giris
 
@@ -93,12 +93,12 @@ Sifre sifirlama icin Supabase > Authentication > URL Configuration alaninda:
 
 ## Store ve Release Dosyalari
 
-- [STORE_LISTING_TR.md](./STORE_LISTING_TR.md)
-- [STORE_LISTING_EN.md](./STORE_LISTING_EN.md)
-- [PRIVACY_POLICY_DRAFT.md](./PRIVACY_POLICY_DRAFT.md)
-- [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md)
-- [BUILD_GUIDE.md](./BUILD_GUIDE.md)
-- [CODEX_CHANGELOG.md](./CODEX_CHANGELOG.md)
+- [docs/STORE_LISTING_TR.md](./docs/STORE_LISTING_TR.md)
+- [docs/STORE_LISTING_EN.md](./docs/STORE_LISTING_EN.md)
+- [docs/PRIVACY_POLICY_DRAFT.md](./docs/PRIVACY_POLICY_DRAFT.md)
+- [docs/RELEASE_CHECKLIST.md](./docs/RELEASE_CHECKLIST.md)
+- [docs/BUILD_GUIDE.md](./docs/BUILD_GUIDE.md)
+- [docs/CODEX_CHANGELOG.md](./docs/CODEX_CHANGELOG.md)
 
 ## Satis Materyalleri
 

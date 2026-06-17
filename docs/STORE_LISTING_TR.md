@@ -1,4 +1,4 @@
-﻿# Saloniva - Store Listing TR
+# Saloniva - Store Listing TR
 
 ## Uygulama adi
 Saloniva

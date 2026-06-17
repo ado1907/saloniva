@@ -1,4 +1,4 @@
-﻿# Saloniva - Store Listing EN
+# Saloniva - Store Listing EN
 
 ## App name
 Saloniva

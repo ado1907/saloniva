@@ -13,7 +13,7 @@ Bu dosya projede hangi klasörün ne işe yaradığını hızlıca görmek için
 | White-label satış paketi | `docs/white-label-sales-kit/` |
 | Güvenlik taraması | `docs/security-review.md` |
 | Canlı ürün planı | `docs/production-launch-plan.md` |
-| GitHub yükleme notu | `GITHUB_UPLOAD.md` |
+| GitHub yükleme notu | `docs/GITHUB_UPLOAD.md` |
 
 ## Kök Dosyalar
 
@@ -88,4 +88,3 @@ White-label klasörü içinde:
 3. Satış materyali gerekiyorsa `docs/white-label-sales-kit/` içinde çalış.
 4. Hedef müşteri ve demo gönderimi için `docs/sales-prospect-list.md` kullan.
 5. Her büyük değişiklikten sonra `npm run typecheck` çalıştır.
-

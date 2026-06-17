@@ -1,4 +1,4 @@
-﻿# Saloniva Release Checklist
+# Saloniva Release Checklist
 
 ## Build readiness
 - [ ] Android AAB hazir mi?

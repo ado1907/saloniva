@@ -1,4 +1,4 @@
-﻿# Saloniva Build Guide
+# Saloniva Build Guide
 
 ## 1. Requirements
 - Node.js LTS or current stable Node installed

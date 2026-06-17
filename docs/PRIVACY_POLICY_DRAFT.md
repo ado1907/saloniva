@@ -1,4 +1,4 @@
-﻿# Saloniva Privacy Policy Draft
+# Saloniva Privacy Policy Draft
 
 Last updated: 20 May 2026
 
